@@ -1,0 +1,623 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\79258\\source\\repos\\pi_server-77\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}|..\\Tests\\Tests.csproj|c:\\users\\79258\\source\\repos\\tests\\controllertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\piruntime.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\runtime\\piruntime.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\pienviroment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\interpreter\\core\\pienviroment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\controllers\\picalculuscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:controllers\\picalculuscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}|..\\Tests\\Tests.csproj|c:\\users\\79258\\source\\repos\\tests\\unittest1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\piruntimesession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\runtime\\piruntimesession.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\syntax\\process.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\interpreter\\core\\syntax\\process.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\controllers\\piprocesscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\controllers\\piprocesscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}|..\\Tests\\Tests.csproj|c:\\users\\79258\\source\\repos\\tests\\tests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\piparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\interpreter\\core\\parser\\piparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\tokentype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\interpreter\\core\\parser\\tokentype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\common\\piparserexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\interpreter\\core\\common\\piparserexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\models\\models.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\models\\models.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\lexer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\interpreter\\core\\parser\\lexer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:version_2\\runtime\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\piserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:piserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\sendprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\sendprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\replicationprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\replicationprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\receiveprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\receiveprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\processbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\processbuilder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\parallelprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\parallelprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\newchannelprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\newchannelprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\mixedinteractionstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\mixedinteractionstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\iprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\iprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\inactiveprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\inactiveprocess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\iinteractionstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\iinteractionstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\envdrivenstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\envdrivenstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\channeldrivenstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\channeldrivenstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\models\\apimodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:models\\apimodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\services\\processservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:services\\processservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\services\\isessionprocessstorage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:services\\isessionprocessstorage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\services\\inmemoryprocessstorage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:services\\inmemoryprocessstorage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|c:\\users\\79258\\source\\repos\\pi_server-77\\services\\environmentmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{858DF3FA-4F28-83C6-72DA-CC3E802A6701}|PiServer.csproj|solutionrelative:services\\environmentmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "TokenType.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\TokenType.cs",
+              "RelativeDocumentMoniker": "version_2\\interpreter\\core\\parser\\TokenType.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\TokenType.cs",
+              "RelativeToolTip": "version_2\\interpreter\\core\\parser\\TokenType.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAiwCUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T21:05:24.309Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ControllerTests.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\Tests\\ControllerTests.cs",
+              "RelativeDocumentMoniker": "..\\Tests\\ControllerTests.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\Tests\\ControllerTests.cs",
+              "RelativeToolTip": "..\\Tests\\ControllerTests.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAYwHgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:51:04.11Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAPoAAAAAAAAAAAAAABoBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-17T16:38:23.505Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PiEnviroment.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\PiEnviroment.cs",
+              "RelativeDocumentMoniker": "version_2\\interpreter\\core\\PiEnviroment.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\PiEnviroment.cs",
+              "RelativeToolTip": "version_2\\interpreter\\core\\PiEnviroment.cs",
+              "ViewState": "AgIAADAAAAAAAAAAAAAywEwAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:15:23.479Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PiRuntime.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\PiRuntime.cs",
+              "RelativeDocumentMoniker": "version_2\\runtime\\PiRuntime.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\PiRuntime.cs",
+              "RelativeToolTip": "version_2\\runtime\\PiRuntime.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:08:03.996Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PiCalculusController.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Controllers\\PiCalculusController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PiCalculusController.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Controllers\\PiCalculusController.cs",
+              "RelativeToolTip": "Controllers\\PiCalculusController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:56:59.046Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UnitTest1.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\Tests\\UnitTest1.cs",
+              "RelativeDocumentMoniker": "..\\Tests\\UnitTest1.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\Tests\\UnitTest1.cs",
+              "RelativeToolTip": "..\\Tests\\UnitTest1.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAowFwAAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T20:27:38.008Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PiRuntimeSession.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\PiRuntimeSession.cs",
+              "RelativeDocumentMoniker": "version_2\\runtime\\PiRuntimeSession.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\PiRuntimeSession.cs",
+              "RelativeToolTip": "version_2\\runtime\\PiRuntimeSession.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:46:06.703Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Process.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\syntax\\Process.cs",
+              "RelativeDocumentMoniker": "version_2\\interpreter\\core\\syntax\\Process.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\syntax\\Process.cs",
+              "RelativeToolTip": "version_2\\interpreter\\core\\syntax\\Process.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T19:59:04.961Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "PiProcessController.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\controllers\\PiProcessController.cs",
+              "RelativeDocumentMoniker": "version_2\\controllers\\PiProcessController.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\controllers\\PiProcessController.cs",
+              "RelativeToolTip": "version_2\\controllers\\PiProcessController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:37:47.279Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Tests.csproj",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\Tests\\Tests.csproj",
+              "RelativeDocumentMoniker": "..\\Tests\\Tests.csproj",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\Tests\\Tests.csproj",
+              "RelativeToolTip": "..\\Tests\\Tests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-07-24T20:28:26.667Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "PiParser.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\PiParser.cs",
+              "RelativeDocumentMoniker": "version_2\\interpreter\\core\\parser\\PiParser.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\PiParser.cs",
+              "RelativeToolTip": "version_2\\interpreter\\core\\parser\\PiParser.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAYwCoAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T20:02:08.63Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "PiParserException.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\common\\PiParserException.cs",
+              "RelativeDocumentMoniker": "version_2\\interpreter\\core\\common\\PiParserException.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\common\\PiParserException.cs",
+              "RelativeToolTip": "version_2\\interpreter\\core\\common\\PiParserException.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T20:03:48.817Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "models.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\models\\models.cs",
+              "RelativeDocumentMoniker": "version_2\\models\\models.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\models\\models.cs",
+              "RelativeToolTip": "version_2\\models\\models.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:29:58.815Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Lexer.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\Lexer.cs",
+              "RelativeDocumentMoniker": "version_2\\interpreter\\core\\parser\\Lexer.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\interpreter\\core\\parser\\Lexer.cs",
+              "RelativeToolTip": "version_2\\interpreter\\core\\parser\\Lexer.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAAADYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T20:01:31.188Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Channel.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\Channel.cs",
+              "RelativeDocumentMoniker": "version_2\\runtime\\Channel.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\version_2\\runtime\\Channel.cs",
+              "RelativeToolTip": "version_2\\runtime\\Channel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-26T15:09:33.438Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "PiServer.csproj",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\PiServer.csproj",
+              "RelativeDocumentMoniker": "PiServer.csproj",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\PiServer.csproj",
+              "RelativeToolTip": "PiServer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-07-24T19:54:24.348Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Properties\\launchSettings.json",
+              "RelativeToolTip": "Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-22T20:35:06.716Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "SendProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\SendProcess.cs",
+              "RelativeDocumentMoniker": "Models\\SendProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\SendProcess.cs",
+              "RelativeToolTip": "Models\\SendProcess.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAswCUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:55:32.697Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "ReplicationProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ReplicationProcess.cs",
+              "RelativeDocumentMoniker": "Models\\ReplicationProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ReplicationProcess.cs",
+              "RelativeToolTip": "Models\\ReplicationProcess.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:55:27.31Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ReceiveProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ReceiveProcess.cs",
+              "RelativeDocumentMoniker": "Models\\ReceiveProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ReceiveProcess.cs",
+              "RelativeToolTip": "Models\\ReceiveProcess.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAcwEgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:55:21.768Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "NewChannelProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\NewChannelProcess.cs",
+              "RelativeDocumentMoniker": "Models\\NewChannelProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\NewChannelProcess.cs",
+              "RelativeToolTip": "Models\\NewChannelProcess.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:55:02.841Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "MixedInteractionStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\MixedInteractionStrategy.cs",
+              "RelativeDocumentMoniker": "Models\\MixedInteractionStrategy.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\MixedInteractionStrategy.cs",
+              "RelativeToolTip": "Models\\MixedInteractionStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:56.481Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "ProcessBuilder.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ProcessBuilder.cs",
+              "RelativeDocumentMoniker": "Models\\ProcessBuilder.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ProcessBuilder.cs",
+              "RelativeToolTip": "Models\\ProcessBuilder.cs",
+              "ViewState": "AgIAAMAAAAAAAAAAAAAcwOMAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-18T11:07:11.426Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "ParallelProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ParallelProcess.cs",
+              "RelativeDocumentMoniker": "Models\\ParallelProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ParallelProcess.cs",
+              "RelativeToolTip": "Models\\ParallelProcess.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAwwC8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-18T11:04:35.988Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "IProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\IProcess.cs",
+              "RelativeDocumentMoniker": "Models\\IProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\IProcess.cs",
+              "RelativeToolTip": "Models\\IProcess.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:50.581Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "InactiveProcess.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\InactiveProcess.cs",
+              "RelativeDocumentMoniker": "Models\\InactiveProcess.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\InactiveProcess.cs",
+              "RelativeToolTip": "Models\\InactiveProcess.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:44.572Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "IInteractionStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\IInteractionStrategy.cs",
+              "RelativeDocumentMoniker": "Models\\IInteractionStrategy.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\IInteractionStrategy.cs",
+              "RelativeToolTip": "Models\\IInteractionStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:36.807Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "EnvDrivenStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\EnvDrivenStrategy.cs",
+              "RelativeDocumentMoniker": "Models\\EnvDrivenStrategy.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\EnvDrivenStrategy.cs",
+              "RelativeToolTip": "Models\\EnvDrivenStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:24.592Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "ChannelDrivenStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ChannelDrivenStrategy.cs",
+              "RelativeDocumentMoniker": "Models\\ChannelDrivenStrategy.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ChannelDrivenStrategy.cs",
+              "RelativeToolTip": "Models\\ChannelDrivenStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:17.01Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "Channel.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\Channel.cs",
+              "RelativeDocumentMoniker": "Models\\Channel.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\Channel.cs",
+              "RelativeToolTip": "Models\\Channel.cs",
+              "ViewState": "AgIAADwAAAAAAAAAAAAIwF0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:54:05.608Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "ApiModels.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ApiModels.cs",
+              "RelativeDocumentMoniker": "Models\\ApiModels.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Models\\ApiModels.cs",
+              "RelativeToolTip": "Models\\ApiModels.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAQwEAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:53:58.471Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "ISessionProcessStorage.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\ISessionProcessStorage.cs",
+              "RelativeDocumentMoniker": "Services\\ISessionProcessStorage.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\ISessionProcessStorage.cs",
+              "RelativeToolTip": "Services\\ISessionProcessStorage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:53:31.206Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "InMemoryProcessStorage.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\InMemoryProcessStorage.cs",
+              "RelativeDocumentMoniker": "Services\\InMemoryProcessStorage.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\InMemoryProcessStorage.cs",
+              "RelativeToolTip": "Services\\InMemoryProcessStorage.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAADwvyYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:53:23.923Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "ProcessService.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\ProcessService.cs",
+              "RelativeDocumentMoniker": "Services\\ProcessService.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\ProcessService.cs",
+              "RelativeToolTip": "Services\\ProcessService.cs",
+              "ViewState": "AgIAAA8BAAAAAAAAAAAUwDEBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:35:59.92Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "EnvironmentManager.cs",
+              "DocumentMoniker": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\EnvironmentManager.cs",
+              "RelativeDocumentMoniker": "Services\\EnvironmentManager.cs",
+              "ToolTip": "C:\\Users\\79258\\source\\repos\\pi_server-77\\Services\\EnvironmentManager.cs",
+              "RelativeToolTip": "Services\\EnvironmentManager.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAwwGgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-22T20:53:15.037Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

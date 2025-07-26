@@ -1,0 +1,118 @@
+[
+  {
+    "ContainingType": "Program\u002B\u003C\u003Ec",
+    "Method": "\u003C\u003CMain\u003E$\u003Eb__0_4",
+    "RelativePath": "",
+    "HttpMethod": "GET",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
+        "MediaTypes": [
+          "text/plain"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "GetDiagram",
+    "RelativePath": "api/builder/diagram",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "Execute",
+    "RelativePath": "api/builder/execute",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "AddInactive",
+    "RelativePath": "api/builder/inactive",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "GetLogs",
+    "RelativePath": "api/builder/logs",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "AddParallel",
+    "RelativePath": "api/builder/parallel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "PiServer.Controllers.ParallelDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "AddReceive",
+    "RelativePath": "api/builder/receive",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "PiServer.Controllers.ReceiveDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "Reset",
+    "RelativePath": "api/builder/reset",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PiServer.Controllers.BuilderController",
+    "Method": "AddSend",
+    "RelativePath": "api/builder/send",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "PiServer.Controllers.SendDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

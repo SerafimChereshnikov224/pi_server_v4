@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiServer", "PiServer.csproj", "{858DF3FA-4F28-83C6-72DA-CC3E802A6701}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\Tests\Tests.csproj", "{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{858DF3FA-4F28-83C6-72DA-CC3E802A6701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{858DF3FA-4F28-83C6-72DA-CC3E802A6701}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{858DF3FA-4F28-83C6-72DA-CC3E802A6701}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{858DF3FA-4F28-83C6-72DA-CC3E802A6701}.Release|Any CPU.Build.0 = Release|Any CPU
+		{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{674E9747-A103-4B6A-9DE7-DC1ED7F7DAC1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {452935E7-3DC9-4A03-8B07-B6D2ED1798C0}
+	EndGlobalSection
+EndGlobal
