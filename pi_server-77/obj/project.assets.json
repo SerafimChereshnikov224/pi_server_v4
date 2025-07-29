@@ -293,32 +293,29 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\79258\\.nuget\\packages\\": {},
+    "C:\\Users\\hobbi\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\79258\\source\\repos\\pi_server-77\\PiServer.csproj",
+      "projectUniqueName": "C:\\c#\\pi_server_v4\\pi_server-77\\PiServer.csproj",
       "projectName": "PiServer",
-      "projectPath": "C:\\Users\\79258\\source\\repos\\pi_server-77\\PiServer.csproj",
-      "packagesPath": "C:\\Users\\79258\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\79258\\source\\repos\\pi_server-77\\obj\\",
+      "projectPath": "C:\\c#\\pi_server_v4\\pi_server-77\\PiServer.csproj",
+      "packagesPath": "C:\\Users\\hobbi\\.nuget\\packages\\",
+      "outputPath": "C:\\c#\\pi_server_v4\\pi_server-77\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\79258\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\hobbi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -337,7 +334,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -377,7 +374,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.108/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

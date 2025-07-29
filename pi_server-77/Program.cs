@@ -231,52 +231,79 @@
 // app.Run();
 
 
+// using Microsoft.AspNetCore.Builder;
+// using Microsoft.AspNetCore.HttpOverrides;
+// using Microsoft.Extensions.DependencyInjection;
+// using PiServer.Services;
+// using PiServer.Storage;
+
+// var builder = WebApplication.CreateBuilder(args);
+
+// builder.Services.Configure<ForwardedHeadersOptions>(options =>
+// {
+//     options.ForwardedHeaders = ForwardedHeaders.None;
+// });
+
+// builder.WebHost.ConfigureKestrel(serverOptions =>
+// {
+//     serverOptions.ListenLocalhost(63878); // Только HTTP
+// });
+
+// // Добавляем контроллеры
+// builder.Services.AddControllers();
+
+// // Добавляем сессии
+// builder.Services.AddDistributedMemoryCache();
+// builder.Services.AddSession(options =>
+// {
+//     options.IdleTimeout = TimeSpan.FromMinutes(30);
+//     options.Cookie.HttpOnly = true;
+//     options.Cookie.IsEssential = true;
+// });
+
+// // Добавляем EnvironmentManager и InMemoryProcessStorage как singleton
+// builder.Services.AddSingleton<EnvironmentManager>();
+// builder.Services.AddSingleton<ISessionProcessStorage, InMemoryProcessStorage>();
+
+// var app = builder.Build();
+
+// app.Use((context, next) =>
+// {
+//     context.Request.Scheme = "http";
+//     return next();
+// });
+
+// // Используем сессии
+// app.UseSession();
+
+// app.MapControllers();
+// app.MapGet("/", () => "π-Calculus Server is running (HTTP only)!");
+
+// app.Run();
+
+
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.DependencyInjection;
-using PiServer.Services;
-using PiServer.Storage;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
-    options.ForwardedHeaders = ForwardedHeaders.None;
-});
-
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.ListenLocalhost(63878); // Только HTTP
-});
-
-// Добавляем контроллеры
+// Добавляем необходимые сервисы
 builder.Services.AddControllers();
-
-// Добавляем сессии
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-
-// Добавляем EnvironmentManager и InMemoryProcessStorage как singleton
-builder.Services.AddSingleton<EnvironmentManager>();
-builder.Services.AddSingleton<ISessionProcessStorage, InMemoryProcessStorage>();
 
 var app = builder.Build();
 
-app.Use((context, next) =>
-{
-    context.Request.Scheme = "http";
-    return next();
-});
+// Настраиваем обработку HTTPS
+// app.UseHttpsRedirection();
+builder.WebHost.UseUrls("http://localhost:8095");
+// Закомментируйте: app.UseHttpsRedirection();
 
-// Используем сессии
-app.UseSession();
+// Разрешаем все CORS запросы (только для разработки!)
+app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+// Регистрируем маршруты контроллеров
 app.MapControllers();
-app.MapGet("/", () => "π-Calculus Server is running (HTTP only)!");
 
 app.Run();
