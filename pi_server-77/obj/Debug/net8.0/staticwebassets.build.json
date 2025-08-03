@@ -1,1 +1,12 @@
-{"Version":1,"Hash":"xjHU7vrOnhthJekUBPL+DNfSgVcFsQ9dVS/Y00AmYiE=","Source":"PiServer","BasePath":"_content/PiServer","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
+{
+  "Version": 1,
+  "Hash": "xjHU7vrOnhthJekUBPL+DNfSgVcFsQ9dVS/Y00AmYiE=",
+  "Source": "PiServer",
+  "BasePath": "_content/PiServer",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

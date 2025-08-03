@@ -34,6 +34,33 @@ public class Lexer
             case '.': _position++; return new Token(TokenType.Dot, position: startPos);
             case '?': _position++; return new Token(TokenType.InputOp, position: startPos);
             case '!': _position++; return new Token(TokenType.OutputOp, position: startPos);
+            case 'ν': _position++; return new Token(TokenType.Star, position: startPos);
+
+            //λ-calculus
+            case 'λ':
+            case '\\':
+                _position++;
+                return new Token(TokenType.Lambda, position: startPos);
+            case ':':
+                if (Peek() == '=')
+                {
+                    _position += 2;
+                    return new Token(TokenType.Def, position: startPos);
+                }
+                break;
+            case '-':
+                if (Peek() == '>')
+                {
+                    _position += 2;
+                    return new Token(TokenType.Arrow, position: startPos);
+                }
+                break;
+        }
+
+        if (current == 'l' && Peek() == 'e' && Peek(2) == 't')
+        {
+            _position += 3;
+            return new Token(TokenType.Let, position: startPos);
         }
 
         if (char.IsLetter(current))
@@ -45,6 +72,11 @@ public class Lexer
         }
 
         throw new Exception($"Unexpected character: '{current}' at position {startPos}");
+    }
+
+    private char Peek(int ahead = 1)
+    {
+        return (_position + ahead) < _input.Length ? _input[_position + ahead] : '\0';
     }
 
     private void SkipWhitespace()

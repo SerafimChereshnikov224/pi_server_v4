@@ -17,7 +17,15 @@
             InputOp,        // ?
             OutputOp,       // !
             Identifier,
-            EndOfInput
+            EndOfInput,
+
+            Lambda,
+
+            Arrow, //->
+
+            Def, //:=
+
+            Let
         }
 
         public class Token
