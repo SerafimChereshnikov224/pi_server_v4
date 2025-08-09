@@ -28,7 +28,17 @@ namespace PiServer.version_2.interpreter.core.syntax
 
         public override async Task ExecuteAsync(PiEnvironment env)
         {
-            await env.SendAsync(Channel, Message);
+            string message;
+            try
+            {
+                message = env.GetVariable(Message); 
+            }
+            catch
+            {
+                message = Message; 
+            }
+
+            await env.SendAsync(Channel, message);
             await Continuation.ExecuteAsync(env);
         }
 
@@ -51,8 +61,8 @@ namespace PiServer.version_2.interpreter.core.syntax
         public override async Task ExecuteAsync(PiEnvironment env)
         {
             var message = await env.ReceiveAsync(Channel);
-            var substituted = Substitute(Continuation, Variable, message);
-            await substituted.ExecuteAsync(env);
+            env.SetVariable(Variable, message); 
+            await Continuation.ExecuteAsync(env);
         }
 
         private Process Substitute(Process process, string variable, string value)
@@ -107,10 +117,37 @@ namespace PiServer.version_2.interpreter.core.syntax
         {
             using (env.Restrict(Name))
             {
+                env.SetVariable(Name, null);
                 await Body.ExecuteAsync(env);
             }
         }
 
         public override string ToString() => $"(ν{Name}){Body}";
+    }
+
+    public class LetProcess : Process
+    {
+        public string ResultVar { get; }     // Куда сохранить результат (z)
+        public LambdaTerm Lambda { get; }   // λ-терм (λx.x)
+        public string ArgumentVar { get; }   // Какая переменная подставляется (x)
+        public Process Continuation { get; }
+
+        public LetProcess(string resultVar, LambdaTerm lambda, string argumentVar, Process continuation)
+        {
+            ResultVar = resultVar;
+            Lambda = lambda;
+            ArgumentVar = argumentVar;
+            Continuation = continuation;
+        }
+
+        public override async Task ExecuteAsync(PiEnvironment env)
+        {
+            string argValue = env.GetVariable(ArgumentVar); // Получаем "hello" для x
+            string result = Lambda.Evaluate(argValue);     // Вычисляем (λx.x) "hello" → "hello"
+            env.SetVariable(ResultVar, result);            // Сохраняем z = "hello"
+            await Continuation.ExecuteAsync(env);
+        }
+
+        public override string ToString() => $"let {ResultVar} = ({Lambda}) {ArgumentVar}.{Continuation}";
     }
 }

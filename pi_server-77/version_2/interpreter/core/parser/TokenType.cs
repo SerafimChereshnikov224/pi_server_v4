@@ -12,7 +12,7 @@
             OpenBracket,    // [
             CloseBracket,   // ]
             Parallel,       // |
-            Star,           // * (бывший Restriction)
+            Star,           // * 
             Dot,            // .
             InputOp,        // ?
             OutputOp,       // !
@@ -20,7 +20,7 @@
             EndOfInput,
 
             Lambda,
-
+            
             Arrow, //->
 
             Def, //:=

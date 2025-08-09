@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PiServer.version_2.controllers;
-using PiServer.version_2.runtime;
 using PiServer.version_2.interpreter.core.parser;
 using PiServer.version_2.interpreter.core.syntax;
+using PiServer.version_2.runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 
 namespace Tests
 {
-    using Xunit;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System.Threading.Tasks;
+    using Xunit;
 
     namespace PiServer.Tests
     {
@@ -35,50 +36,6 @@ namespace Tests
                 Assert.Equal("0", response.CurrentState);
             }
 
-            //[Fact]
-            //public async Task ExecuteStep_WithOutputProcess_CompletesAfterOneStep()
-            //{
-            //    // Arrange
-            //    var startResult = _controller.StartProcess(new ProcessRequest
-            //    {
-            //        ProcessDefinition = "x![y].0"
-            //    }) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    var sessionId = (startResult.Value as ProcessResponse).SessionId;
-
-            //    // Act
-            //    var stepResult = await _controller.ExecuteStep(sessionId) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    var stepResponse = stepResult.Value as StepResult;
-
-            //    // Assert
-            //    Assert.Equal("0", stepResponse.CurrentState);
-            //    Assert.True(stepResponse.IsCompleted);
-            //}
-
-            //[Fact]
-            //public async Task ExecuteStep_WithParallelProcess_ExecutesBothBranches()
-            //{
-            //    // Arrange
-            //    var startResult = _controller.StartProcess(new ProcessRequest
-            //    {
-            //        ProcessDefinition = "x![y].0 | z![w].0"
-            //    }) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    var sessionId = (startResult.Value as ProcessResponse).SessionId;
-
-            //    // Act - First step
-            //    var step1 = await _controller.ExecuteStep(sessionId) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    var response1 = step1.Value as StepResult;
-
-            //    // Assert - After first step
-            //    Assert.Contains("x![y].0", response1.CurrentState);
-            //    Assert.Contains("z![w].0", response1.CurrentState);
-
-            //    // Act - Second step
-            //    var step2 = await _controller.ExecuteStep(sessionId) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    var response2 = step2.Value as StepResult;
-
-            //    // Assert - After second step
-            //    Assert.Equal("0 | 0", response2.CurrentState);
-            //}
 
             [Fact]
             public void GetState_WithInvalidSession_ReturnsNotFound()
@@ -105,40 +62,55 @@ namespace Tests
                 // Act
                 var result = await runtime.ExecuteStepAsync();
 
-                // Assert
-                // Проверяем, что коммуникация произошла
                 Assert.Equal(1, result.ParallelActions.Count);
                 Assert.Contains("Sent 'hello' via x", result.ParallelActions);
 
-                // Проверяем новое состояние
                 Assert.Equal("(0 | 0)", result.CurrentState);
 
-                // Проверяем описание действия
                 Assert.Equal("Parallel step (1 actions)", result.LastAction);
 
-                // Процесс должен быть завершен, так как все подпроцессы - NullProcess
                 Assert.True(result.IsCompleted);
 
             }
 
-            //[Fact]
-            //public async Task ExecuteStep_WithComplexProcess_ExecutesCorrectly()
-            //{
-            //    // Arrange
-            //    var startResult = _controller.StartProcess(new ProcessRequest
-            //    {
-            //        ProcessDefinition = "(νx)(x![z].0 | x?(y).y![x].0) | z?(v).v![v].0"
-            //    }) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    var sessionId = (startResult.Value as ProcessResponse).SessionId;
+            [Fact]
+            public async Task LetProcess_InParallel_ComputesCorrectly()
+            {
+                // Arrange a![hello] | a?(x). let z = (λx.x) x . out![z] 
+                var process = new ParallelProcess(new List<Process>
+                {
+                    new InputProcess("a", "x",
+                        new LetProcess("z", new LambdaAbs("x", new LambdaVar("x")), "x",
+                        new OutputProcess("out", "z", new NullProcess()))),
+                    new OutputProcess("a", "hello", new NullProcess())
+                });
 
-            //    // Act & Assert - Step 1
-            //    var step1 = await _controller.ExecuteStep(sessionId) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    Assert.Contains("(νx)(0 | z![x].0)", (step1.Value as StepResult).CurrentState);
+                var runtime = new PiRuntime(process);
 
-            //    // Act & Assert - Step 2
-            //    var step2 = await _controller.ExecuteStep(sessionId) as Microsoft.AspNetCore.Mvc.OkObjectResult;
-            //    Assert.Contains("(νx)(0 | x![x].0)", (step2.Value as StepResult).CurrentState);
-            //}
+                // Шаг 1: Должен выполнить коммуникацию a!["hello"] -> a?(x)
+                var step1 = await runtime.ExecuteStepAsync();
+                Assert.Single(step1.ParallelActions);
+                Assert.Contains("Sent 'hello' via a", step1.ParallelActions);
+
+                // Шаг 2: Должен вычислить let z = (λx.x) x
+                var step2 = await runtime.ExecuteStepAsync();
+                Assert.Single(step2.ParallelActions);
+                Assert.Contains("Computed z = λx.x", step2.ParallelActions);
+
+                var zValue = runtime._env.GetVariable("z");
+                Console.WriteLine($"Значение z: {zValue}"); 
+                                                            
+                Console.WriteLine($"Value of z: {runtime._env.GetVariable("z")}");
+                Console.WriteLine($"Current process: {runtime.CurrentProcess}");
+                Console.WriteLine($"Enviroment: {string.Join(", ", runtime._env._variables.Select(v => $"{v.Key}={v.Value}"))}");
+
+                var step3 = await runtime.ExecuteStepAsync();
+                Assert.Equal("Sent 'hello' to out", step3.LastAction);
+                Assert.True(step3.ParallelActions.Count == 0); 
+
+                Console.WriteLine($"Sent: {step3.LastAction}"); // Должно быть "Sent 'hello' to out"
+            }
+
         }
 
 

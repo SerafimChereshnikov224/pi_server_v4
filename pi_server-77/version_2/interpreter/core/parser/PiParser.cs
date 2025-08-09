@@ -50,21 +50,16 @@ namespace PiServer.version_2.interpreter.core.parser
             {
                 case TokenType.NullProcess:
                     return ParseNull();
-
-                // case TokenType.OpenParen:
-                //     return ParseInput(); // Только для ограничений
-
                 case TokenType.OpenBrace:
-                    return ParseBracedRestriction(); // Только для ограничений
-
+                    return ParseBracedRestriction();
                 case TokenType.OpenParen:
                     return ParseParenthesized();
-
                 case TokenType.Identifier:
                     return ParseAction();
-
+                case TokenType.Let:  
+                    return ParseLet();
                 default:
-                    throw new Exception($"Unexpected token: {_currentToken.Type} at position {_currentToken.Position}");
+                    throw new Exception($"Unexpected token: {_currentToken.Type}");
             }
         }
 
@@ -83,35 +78,6 @@ namespace PiServer.version_2.interpreter.core.parser
             return ParseInput(channel);
         }
 
-
-        // private Process ParseOutput(string channel)
-        // {
-        //     Eat(TokenType.OutputOp);
-        //     Eat(TokenType.OpenBracket);
-
-        //     // Новый метод определения типа сообщения
-        //     string message = ParseMessage(); 
-
-        //     Eat(TokenType.CloseBracket);
-        //     Eat(TokenType.Dot);
-        //     return new OutputProcess(channel, message, ParseSingleProcess());
-        // }
-
-        // private string ParseMessage()
-        // {
-        //     if (_currentToken.Type == TokenType.Lambda)
-        //     {
-        //         LambdaTerm term = ParseLambdaTerm();
-        //         return term.ToString(); // Возвращаем LambdaTerm
-        //     }
-        //     else if (_currentToken.Type == TokenType.Identifier)
-        //     {
-        //         string value = _currentToken.Value;
-        //         Eat(TokenType.Identifier);
-        //         return value; // Возвращаем строку
-        //     }
-        //     throw new Exception($"Invalid message format at position {_currentToken.Position}");
-        // }
 
         private Process ParseOutput(string channel)
         {
@@ -162,46 +128,6 @@ namespace PiServer.version_2.interpreter.core.parser
             };
         }
                 
-
-        // private LambdaTerm ParseLambdaTerm()
-        // {
-        //     Eat(TokenType.Lambda);
-        //     var param = _currentToken.Value;
-        //     Eat(TokenType.Identifier);
-        //     Eat(TokenType.Dot);
-        //     return new LambdaAbs(param, ParseLambdaExpression());
-        // }
-
-        // private LambdaTerm ParseLambdaExpression()
-        // {
-        //     var term = ParseLambdaAtom();
-        //     while (_currentToken.Type == TokenType.Identifier || 
-        //         _currentToken.Type == TokenType.OpenParen)
-        //     {
-        //         term = new LambdaApp(term, ParseLambdaAtom());
-        //     }
-        //     return term;
-        // }
-
-        // private LambdaTerm ParseLambdaAtom()
-        // {
-        //     if (_currentToken.Type == TokenType.OpenParen)
-        //     {
-        //         Eat(TokenType.OpenParen);
-        //         var term = ParseLambdaExpression();
-        //         Eat(TokenType.CloseParen);
-        //         return term;
-        //     }
-        //     var varName = _currentToken.Value;
-        //     Eat(TokenType.Identifier);
-        //     return new LambdaVar(varName);
-        // }
-
-
-
-
-        //
-        //
 
         private Process ParseInput(string channel)
         {
@@ -279,6 +205,35 @@ namespace PiServer.version_2.interpreter.core.parser
             return process;
         }
 
+        private Process ParseLet()
+        {
+            Eat(TokenType.Let);
+            string varName = _currentToken.Value;
+            Eat(TokenType.Identifier);
+
+            Eat(TokenType.Def);
+
+            Eat(TokenType.OpenParen);
+
+            LambdaTerm term = ParseLambdaTerm();
+
+            Eat(TokenType.CloseParen);
+
+            string argVar = _currentToken.Value;
+            Eat(TokenType.Identifier);
+
+            Eat(TokenType.Dot);
+
+            return new LetProcess(
+                varName,
+                term,
+                argVar,
+                ParseSingleProcess()
+            );
+        }
+
+
+
         private void Eat(TokenType type)
         {
             if (_currentToken.Type == type)
@@ -289,6 +244,40 @@ namespace PiServer.version_2.interpreter.core.parser
             {
                 throw new Exception($"Expected {type}, got {_currentToken.Type} at position {_currentToken.Position}");
             }
+        }
+
+        private LambdaTerm ParseLambdaTerm()
+        {
+            if (_currentToken.Type == TokenType.Lambda)
+            {
+                Eat(TokenType.Lambda);
+                string param = _currentToken.Value;
+                Eat(TokenType.Identifier);
+                Eat(TokenType.Dot);
+                return new LambdaAbs(param, ParseLambdaTerm());
+            }
+
+            var term = ParseLambdaAtom();
+            while (_currentToken.Type == TokenType.Identifier || _currentToken.Type == TokenType.OpenParen)
+            {
+                term = new LambdaApp(term, ParseLambdaAtom());
+            }
+            return term;
+        }
+
+        private LambdaTerm ParseLambdaAtom()
+        {
+            if (_currentToken.Type == TokenType.OpenParen)
+            {
+                Eat(TokenType.OpenParen);
+                var term = ParseLambdaTerm();
+                Eat(TokenType.CloseParen);
+                return term;
+            }
+
+            string varName = _currentToken.Value;
+            Eat(TokenType.Identifier);
+            return new LambdaVar(varName);
         }
     }
 }

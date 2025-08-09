@@ -35,6 +35,9 @@ public class Lexer
             case '?': _position++; return new Token(TokenType.InputOp, position: startPos);
             case '!': _position++; return new Token(TokenType.OutputOp, position: startPos);
             case 'ν': _position++; return new Token(TokenType.Star, position: startPos);
+            case '=':
+                _position++;
+                return new Token(TokenType.Def, position: startPos);
 
             //λ-calculus
             case 'λ':

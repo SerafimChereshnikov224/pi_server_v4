@@ -5,6 +5,21 @@
         private readonly Dictionary<string, Channel> _channels = new();
         private readonly HashSet<string> _restrictedNames = new();
 
+        public readonly Dictionary<string, string> _variables = new();
+
+        public string GetVariable(string name)
+        {
+            if (_variables.TryGetValue(name, out var val))
+                return val;
+
+            return name;
+        }
+
+        public void SetVariable(string name, string value)
+        {
+            _variables[name] = value;
+        }
+
         public Channel GetChannel(string name)
         {
             if (_restrictedNames.Contains(name))

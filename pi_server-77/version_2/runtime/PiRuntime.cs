@@ -8,7 +8,7 @@ namespace PiServer.version_2.runtime
     using System.Threading.Tasks;
         public class PiRuntime
         {
-            private readonly PiEnvironment _env = new();
+            public readonly PiEnvironment _env = new();
             private Process _currentProcess;
 
             public Process CurrentProcess => _currentProcess;
@@ -24,84 +24,87 @@ namespace PiServer.version_2.runtime
                 _currentProcess = initialProcess;
             }
 
-            public async Task<StepResult> ExecuteStepAsync()
+        public async Task<StepResult> ExecuteStepAsync()
+        {
+            if (IsCompleted)
+                throw new InvalidOperationException("Process completed");
+
+            var result = new StepResult();
+
+            if (_currentProcess is ParallelProcess pp)
             {
-                if (IsCompleted)
-                    throw new InvalidOperationException("Process completed");
-
-                var result = new StepResult();
-
-                if (_currentProcess is ParallelProcess pp)
-                {
-                    // Параллельное выполнение всех возможных коммуникаций
-                    var executed = await ExecuteParallelCommunications(pp);
-
-                    result.CurrentState = executed.NewProcess.ToString();
-                    result.LastAction = $"Parallel step ({executed.Communications.Count} actions)";
-                    result.ParallelActions = executed.Communications;
-                    _currentProcess = executed.NewProcess;
-                }
-                else
-                {
-                    // Последовательное выполнение
-                    result.LastAction = GetActionType(_currentProcess);
-                    await _currentProcess.ExecuteAsync(_env);
-                    _currentProcess = GetNextProcess(_currentProcess);
-                    result.CurrentState = _currentProcess.ToString();
-                }
-
-                result.IsCompleted = IsCompleted;
-                return result;
+                var (newProcess, comms) = await ExecuteParallelCommunications(pp);
+                _currentProcess = newProcess;
+                result.ParallelActions = comms;
+                result.LastAction = comms.Count > 0 ? $"Parallel step ({comms.Count} actions)" : "No parallel actions";
+            }
+            else
+            {
+                result.LastAction = GetActionType(_currentProcess);
+                await _currentProcess.ExecuteAsync(_env);
+                _currentProcess = GetNextProcess(_currentProcess);
             }
 
-            private async Task<(Process NewProcess, List<string> Communications)> ExecuteParallelCommunications(ParallelProcess pp)
+            result.CurrentState = _currentProcess.ToString();
+            result.IsCompleted = IsCompleted;
+            return result;
+        }
+
+        private async Task<(Process NewProcess, List<string> Communications)> ExecuteParallelCommunications(ParallelProcess pp)
+        {
+            var continuations = new List<Process>();
+            var communications = new List<string>();
+
+            // Группируем процессы по типам
+            var lets = pp.Processes.OfType<LetProcess>().ToList();
+
+            var outputs = pp.Processes
+                .Where(p => p is OutputProcess && !(p is LetProcess))
+                .Cast<OutputProcess>()
+                .ToList();
+
+            var inputs = pp.Processes
+                .Where(p => p is InputProcess && !(p is LetProcess))
+                .Cast<InputProcess>()
+                .ToList();
+
+            // 1. Выполняем все возможные коммуникации
+            foreach (var op in outputs.ToList())
             {
-                var remaining = new List<Process>();
-                var communications = new List<string>();
-
-                // 1. Выполняем все возможные коммуникации
-                var outputs = pp.Processes.OfType<OutputProcess>().ToList();
-                var inputs = pp.Processes.OfType<InputProcess>().ToList();
-
-                foreach (var op in outputs)
+                var matchingInput = inputs.FirstOrDefault(ip => ip.Channel == op.Channel);
+                if (matchingInput != null)
                 {
-                    var matchingInput = inputs.FirstOrDefault(ip => ip.Channel == op.Channel);
-                    if (matchingInput != null)
-                    {
-                        // Выполняем коммуникацию
-                        await _env.SendAsync(op.Channel, op.Message);
-                        communications.Add($"Sent '{op.Message}' via {op.Channel}");
+                    string message = _env.GetVariable(op.Message);
+                    await _env.SendAsync(op.Channel, message);
+                    communications.Add($"Sent '{message}' via {op.Channel}");
 
-                        // Подставляем значение и сохраняем продолжения
-                        var subContinuation = Substitute(matchingInput.Continuation, matchingInput.Variable, op.Message);
-                        remaining.Add(subContinuation);
-                        remaining.Add(op.Continuation);
+                    continuations.Add(Substitute(matchingInput.Continuation, matchingInput.Variable, message));
+                    continuations.Add(op.Continuation);
 
-                        // Помечаем как обработанные
-                        inputs.Remove(matchingInput);
-                        continue;
-                    }
-
-                    // Если получателя нет, оставляем как есть
-                    remaining.Add(op);
+                    outputs.Remove(op);
+                    inputs.Remove(matchingInput);
                 }
-
-                // 2. Добавляем оставшиеся процессы
-                remaining.AddRange(inputs);
-                remaining.AddRange(pp.Processes.Where(p => p is not OutputProcess and not InputProcess));
-
-                // 3. Формируем новый процесс
-                var newProcess = remaining.Count switch
-                {
-                    0 => new NullProcess(),
-                    1 => remaining[0],
-                    _ => new ParallelProcess(remaining)
-                };
-
-                return (newProcess, communications);
             }
 
-            private Process Substitute(Process process, string variable, string value)
+            foreach (var let in lets)
+            {
+                await let.ExecuteAsync(_env);
+                continuations.Add(let.Continuation);
+                communications.Add($"Computed {let.ResultVar} = {let.Lambda}");
+            }
+
+            continuations.AddRange(outputs);
+            continuations.AddRange(inputs);
+
+            return (continuations.Count switch
+            {
+                0 => new NullProcess(),
+                1 => continuations[0],
+                _ => new ParallelProcess(continuations)
+            }, communications);
+        }
+
+        private Process Substitute(Process process, string variable, string value)
             {
                 if (process is NullProcess) return process;
                 if (process is OutputProcess op)
@@ -115,31 +118,51 @@ namespace PiServer.version_2.runtime
                         ip.Channel == variable ? value : ip.Channel,
                         ip.Variable,
                         Substitute(ip.Continuation, variable, value));
+                if (process is LetProcess lp)
+                    return new LetProcess(
+                    lp.ResultVar,
+                    lp.Lambda,
+                    lp.ArgumentVar == variable ? value : lp.ArgumentVar, 
+                    Substitute(lp.Continuation, variable, value)
+                );
 
-                return process;
+            return process;
             }
 
-            private string GetActionType(Process process)
+        private string GetActionType(Process process)
+        {
+            return process switch
             {
-                return process switch
-                {
-                    OutputProcess op => $"Sent '{op.Message}' to {op.Channel}",
-                    InputProcess ip => $"Received on {ip.Channel}",
-                    RestrictionProcess rp => $"New restriction '{rp.Name}'",
-                    _ => "Process advanced"
-                };
-            }
+                OutputProcess op => $"Sent '{GetMessageValue(op)}' to {op.Channel}",
+                InputProcess ip => $"Received on {ip.Channel}",
+                RestrictionProcess rp => $"New restriction '{rp.Name}'",
+                _ => "Process advanced"
+            };
+        }
 
-            private Process GetNextProcess(Process process)
+        private Process GetNextProcess(Process process)
             {
                 return process switch
                 {
                     OutputProcess op => op.Continuation,
                     InputProcess ip => ip.Continuation,
+                    LetProcess lp => lp.Continuation,
                     _ => process
                 };
             }
-}
+
+        private string GetMessageValue(OutputProcess op)
+        {
+            try
+            {
+                return _env.GetVariable(op.Message);
+            }
+            catch
+            {
+                return op.Message;
+            }
+        }
+    }
 
         public class StepResult
         {

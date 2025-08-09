@@ -1,6 +1,7 @@
-using Xunit;
+п»їusing PiServer.version_2.interpreter.core.parser;
 using PiServer.version_2.interpreter.core.syntax;
-using PiServer.version_2.interpreter.core.parser;
+using PiServer.version_2.runtime;
+using Xunit;
 
 namespace PiServer.version_2.interpreter.tests
 {
@@ -53,7 +54,7 @@ namespace PiServer.version_2.interpreter.tests
             Assert.IsType<OutputProcess>(processes[0]);
             Assert.IsType<InputProcess>(processes[1]);
 
-            // Дополнительные проверки
+            // Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РїСЂРѕРІРµСЂРєРё
             var output = (OutputProcess)processes[0];
             Assert.Equal("x", output.Channel);
             Assert.Equal("y", output.Message);
@@ -94,19 +95,15 @@ namespace PiServer.version_2.interpreter.tests
             var parser = new PiParser(input);
             var result = parser.Parse();
 
-            // Проверяем верхний уровень
             var parallel = Assert.IsType<ParallelProcess>(result);
             Assert.Equal(2, parallel.Processes.Count);
 
-            // Проверяем левую часть (ограничение)
             var restriction = Assert.IsType<RestrictionProcess>(parallel.Processes[0]);
             Assert.Equal("x", restriction.Name);
 
-            // Проверяем внутреннюю параллельную композицию
             var innerParallel = Assert.IsType<ParallelProcess>(restriction.Body);
             Assert.Equal(2, innerParallel.Processes.Count);
 
-            // Проверяем правую часть (input)
             var inputProcess = Assert.IsType<InputProcess>(parallel.Processes[1]);
             InputProcess p1 = (InputProcess) parallel.Processes[1];
             Assert.IsType<OutputProcess>(p1.Continuation);
@@ -143,6 +140,43 @@ namespace PiServer.version_2.interpreter.tests
                 });
 
             Assert.Equal("(x![y].0 | a?(b).0)", process.ToString());
+        }
+
+        [Fact]
+        public void ParsesLambdaInOutput()
+        {
+            var input = "a![О»x.x].0";
+            var result = new PiParser(input).Parse();
+
+            var output = Assert.IsType<OutputProcess>(result);
+            Assert.Equal("О»x.x", output.Message);
+        }
+
+        [Fact]
+        public void ParsesLetExpression()
+        {
+            var input = "let z = (О»x.x) y.0";
+            var result = new PiParser(input).Parse();
+
+            var let = Assert.IsType<LetProcess>(result);
+            Assert.Equal("z", let.ResultVar);      
+            Assert.Equal("О»x.x", let.Lambda.ToString()); 
+            Assert.Equal("y", let.ArgumentVar);    
+        }
+
+        [Fact]
+        public async Task LegacyBehavior_StillWorks()
+        {
+            // a?(x).b![x].0 | a!["test"]
+            var process = new ParallelProcess(new List<Process> {
+                new InputProcess("a", "x", new OutputProcess("b", "x", new NullProcess())),
+                new OutputProcess("a", "test", new NullProcess())
+            });
+
+            var runtime = new PiRuntime(process);
+            var result = await runtime.ExecuteStepAsync();
+
+            Assert.Contains("Sent 'test' via a", result.ParallelActions);
         }
     }
 }
