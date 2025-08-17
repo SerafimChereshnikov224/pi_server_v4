@@ -1,4 +1,5 @@
-﻿namespace PiServer.version_2.interpreter.core
+﻿using PiServer.version_2.runtime;  
+namespace PiServer.version_2.interpreter.core
 {
     public class PiEnvironment : IDisposable
     {
@@ -6,6 +7,22 @@
         private readonly HashSet<string> _restrictedNames = new();
 
         public readonly Dictionary<string, string> _variables = new();
+
+        public IReadOnlyDictionary<string, string> Variables => _variables;
+
+        public IReadOnlyDictionary<string, Channel> Channels => _channels;
+
+        public IReadOnlyCollection<string> ActiveRestrictions => _restrictedNames.ToList();
+
+
+        public IReadOnlyCollection<string> GetChannelState(string channelName)
+        {
+            if (_channels.TryGetValue(channelName, out var channel))
+            {
+                return new PiServer.version_2.runtime.Channel("temp").GetMessages().ToList().AsReadOnly();
+            }
+            return new List<string>().AsReadOnly();
+        }
 
         public string GetVariable(string name)
         {

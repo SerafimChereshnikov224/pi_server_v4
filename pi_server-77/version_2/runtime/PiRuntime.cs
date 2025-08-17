@@ -1,5 +1,6 @@
 ﻿using PiServer.version_2.interpreter.core;
 using PiServer.version_2.interpreter.core.syntax;
+using System.Text.Json.Serialization;
 
 namespace PiServer.version_2.runtime
 {
@@ -12,6 +13,7 @@ namespace PiServer.version_2.runtime
             private Process _currentProcess;
 
             public Process CurrentProcess => _currentProcess;
+
         public bool IsCompleted => _currentProcess switch
         {
             NullProcess => true,
@@ -29,24 +31,60 @@ namespace PiServer.version_2.runtime
             if (IsCompleted)
                 throw new InvalidOperationException("Process completed");
 
-            var result = new StepResult();
+            if (_env == null)
+                throw new InvalidOperationException("Environment is not initialized");
+
+            var result = new StepResult
+            {
+                // Инициализируем обязательные свойства
+                CurrentState = string.Empty,
+                LastAction = string.Empty,
+                Variables = new Dictionary<string, string>(),
+                ChannelStates = new Dictionary<string, List<string>>(),
+                ActiveRestrictions = new List<string>()
+            };
 
             if (_currentProcess is ParallelProcess pp)
             {
                 var (newProcess, comms) = await ExecuteParallelCommunications(pp);
                 _currentProcess = newProcess;
-                result.ParallelActions = comms;
-                result.LastAction = comms.Count > 0 ? $"Parallel step ({comms.Count} actions)" : "No parallel actions";
+                result.ParallelActions = comms ?? new List<string>();
+                result.LastAction = comms?.Count > 0 ? $"Parallel step ({comms.Count} actions)" : "No parallel actions";
             }
             else
             {
-                result.LastAction = GetActionType(_currentProcess);
+                result.LastAction = GetActionType(_currentProcess) ?? "Unknown action";
                 await _currentProcess.ExecuteAsync(_env);
-                _currentProcess = GetNextProcess(_currentProcess);
+                _currentProcess = GetNextProcess(_currentProcess) ?? throw new InvalidOperationException("Next process is null");
             }
 
-            result.CurrentState = _currentProcess.ToString();
+            // Заполняем состояние процесса
+            result.CurrentState = _currentProcess?.ToString() ?? "Null state";
             result.IsCompleted = IsCompleted;
+
+            // Заполняем окружение из PiEnvironment
+            if (_env.Variables != null)
+            {
+                result.Variables = _env.Variables.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value
+                );
+            }
+
+            if (_env.Channels != null)
+            {
+                result.ChannelStates = _env.Channels.ToDictionary(
+                    channel => channel.Key,
+                    channel => new PiServer.version_2.runtime.Channel("temp").GetMessages()?.ToList() ?? new List<string>()
+                );
+            }
+
+            // Предполагая, что добавили это свойство в PiEnvironment
+            if (_env.ActiveRestrictions != null)
+            {
+                result.ActiveRestrictions = _env.ActiveRestrictions.ToList();
+            }
+
             return result;
         }
 
@@ -164,13 +202,16 @@ namespace PiServer.version_2.runtime
         }
     }
 
-        public class StepResult
-        {
-            public string CurrentState { get; set; }
-            public string LastAction { get; set; }
-            public bool IsCompleted { get; set; }
-            public List<string> ParallelActions { get; set; } = new List<string>();
-        }
+    public class StepResult
+    {
+        public string CurrentState { get; set; } = string.Empty;
+        public string LastAction { get; set; } = string.Empty;
+        public bool IsCompleted { get; set; }
+        public List<string> ParallelActions { get; set; } = new();
+        public Dictionary<string, string> Variables { get; set; } = new();
+        public Dictionary<string, List<string>> ChannelStates { get; set; } = new();
+        public List<string> ActiveRestrictions { get; set; } = new();
     }
+}
 
 

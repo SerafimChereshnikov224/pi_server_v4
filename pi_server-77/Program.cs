@@ -291,8 +291,12 @@ using Microsoft.Extensions.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Добавляем необходимые сервисы
-builder.Services.AddControllers();
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // сохраняет имена свойств как есть
+    });
 var app = builder.Build();
 
 // Настраиваем обработку HTTPS
