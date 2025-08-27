@@ -297,6 +297,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
         options.JsonSerializerOptions.PropertyNamingPolicy = null; // сохраняет имена свойств как есть
     });
+    
 var app = builder.Build();
 
 // Настраиваем обработку HTTPS
@@ -311,3 +312,37 @@ app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
 app.MapControllers();
 
 app.Run();
+
+// using System;
+// using PiServer.version_2.controllers;
+// using PiServer.Services;
+
+// namespace LambdaEvaluatorConsole
+// {
+//     class Program
+//     {
+//         static void Main(string[] args)
+//         {
+//             Console.WriteLine("=== Lambda Evaluator Console ===");
+
+//             while (true)
+//             {
+//                 Console.Write("\nВведите выражение (или 'exit' для выхода): ");
+//                 var expression = Console.ReadLine();
+
+//                 if (string.IsNullOrEmpty(expression) || expression.ToLower() == "exit")
+//                     break;
+
+//                 try
+//                 {
+//                     var result = LambdaEvaluator.EvaluateLambda(expression);
+//                     Console.WriteLine($"Результат: {result}");
+//                 }
+//                 catch (Exception ex)
+//                 {
+//                     Console.WriteLine($"Ошибка: {ex.Message}");
+//                 }
+//             }
+//         }
+//     }
+// }

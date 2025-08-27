@@ -2,7 +2,12 @@
 using PiServer.version_2.interpreter.core.parser;
 using PiServer.version_2.models;
 using PiServer.version_2.runtime;
+// using PiServer.version_2.services;
 using System.Collections.Concurrent;
+using PiServer.Services; // Используйте вашу локальную версию
+using System.Text.Json;
+
+
 
 namespace PiServer.version_2.controllers
 {
@@ -16,6 +21,7 @@ namespace PiServer.version_2.controllers
     public class PiProcessController : ControllerBase
     {
         internal static readonly ConcurrentDictionary<string, PiRuntimeSession> _sessions = new();
+
 
         [HttpPost("start")]
         public IActionResult StartProcess([FromBody] ProcessRequest request)
@@ -69,6 +75,25 @@ namespace PiServer.version_2.controllers
                 IsCompleted = session.IsCompleted
             });
         }
+
+
+    [HttpPost("evaluate")]
+    public IActionResult EvaluateLambda([FromBody] LambdaRequest request)
+    {
+        try
+        {
+            var result = LambdaEvaluator.EvaluateLambda(request.Expression);
+            return Ok(new { result });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    
+
+
     }
 
     public class ProcessRequest
@@ -87,4 +112,27 @@ namespace PiServer.version_2.controllers
         public string CurrentState { get; set; }
         public bool IsCompleted { get; set; }
     }
+
+
+
+    public class LambdaRequest
+    {
+        public string Expression { get; set; }
+    }
+
+    public class LambdaResponse
+    {
+        public bool Success { get; set; }
+        public object Result { get; set; }
+        public string Expression { get; set; }
+        public string Error { get; set; }
+        public string ResultType { get; set; }
+    }
+
+
+
+
+    ////
+    /// 
+
 }
