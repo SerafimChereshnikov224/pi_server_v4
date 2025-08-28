@@ -3,6 +3,8 @@ using PiServer.version_2.interpreter.core.syntax;
 using System;
 using System.Text;
 using System.Collections.Generic;
+using PiServer.Services; 
+
 
 namespace PiServer.version_2.interpreter.core.parser
 {
@@ -10,6 +12,7 @@ namespace PiServer.version_2.interpreter.core.parser
     {
         private readonly Lexer _lexer;
         private Token _currentToken;
+
 
         public PiParser(string input)
         {
@@ -43,6 +46,7 @@ namespace PiServer.version_2.interpreter.core.parser
                 ? processes[0]
                 : new ParallelProcess(processes);
         }
+        
 
         private Process ParseSingleProcess()
         {
@@ -56,7 +60,7 @@ namespace PiServer.version_2.interpreter.core.parser
                     return ParseParenthesized();
                 case TokenType.Identifier:
                     return ParseAction();
-                case TokenType.Let:  
+                case TokenType.Let:
                     return ParseLet();
                 default:
                     throw new Exception($"Unexpected token: {_currentToken.Type}");
@@ -92,38 +96,104 @@ namespace PiServer.version_2.interpreter.core.parser
             return new OutputProcess(channel, message, ParseSingleProcess());
         }
 
+
         private string ReadMessageContent()
         {
+            if (_currentToken.Type == TokenType.CloseBracket)
+            {
+                Eat(TokenType.CloseBracket);
+                return ""; // Пустое сообщение
+            }
             var sb = new StringBuilder();
             int depth = 1; // Учитываем уже открытую скобку [
-            
+
             while (depth > 0 && _currentToken.Type != TokenType.EndOfInput)
             {
-                // Обрабатываем вложенные структуры
+                if (sb.Length > 0) 
+                {
+                    sb.Append(" ");
+                }
+                // Просто собираем все содержимое как строку
+                switch (_currentToken.Type)
+                {
+                    case TokenType.Identifier:
+                        sb.Append(_currentToken.Value);
+                        break;
+                    case TokenType.Number:
+                        sb.Append(_currentToken.Value); // Добавьте эту строку
+                        break;
+                    case TokenType.Lambda:
+                        sb.Append("\\");
+                        break;
+                    case TokenType.Fun:
+                        sb.Append("fun");
+                        break;
+                    case TokenType.Arrow:
+                        sb.Append("->");
+                        break;
+                    case TokenType.Dot:
+                        sb.Append(".");
+                        break;
+                    case TokenType.OpenParen:
+                        sb.Append("(");
+                        break;
+                    case TokenType.CloseParen:
+                        sb.Append(")");
+                        break;
+                    case TokenType.Plus:
+                        sb.Append("+");
+                        break;
+                    case TokenType.Minus:
+                        sb.Append("-");
+                        break;
+                    case TokenType.Multiply:
+                        sb.Append("*");
+                        break;
+                    case TokenType.Divide:
+                        sb.Append("/");
+                        break;
+                    default:
+                        // Для всех остальных токенов используем их строковое представление
+                        sb.Append(GetTokenSymbol(_currentToken.Type));
+                        break;
+                }
+
+                _currentToken = _lexer.NextToken();
+
+                // Обновляем глубину для вложенных скобок
                 if (_currentToken.Type == TokenType.OpenBracket) depth++;
                 if (_currentToken.Type == TokenType.CloseBracket) depth--;
-                
+
                 if (depth == 0) break;
-                
-                // Добавляем содержимое токена
-                sb.Append(_currentToken.Type == TokenType.Identifier 
-                    ? _currentToken.Value 
-                    : GetTokenSymbol(_currentToken.Type));
-                
-                _currentToken = _lexer.NextToken();
             }
-            
+
             return sb.ToString();
         }
+
 
         private string GetTokenSymbol(TokenType type)
         {
             return type switch
             {
+                TokenType.Number => "", // будет обработано в основном методе
+                TokenType.Plus => "+",
+                TokenType.Minus => "-",
+                TokenType.Multiply => "*",
+                TokenType.Divide => "/",
                 TokenType.Lambda => "λ",
+                TokenType.Fun => "fun",
+                TokenType.Arrow => "->",
                 TokenType.Dot => ".",
                 TokenType.OpenParen => "(",
                 TokenType.CloseParen => ")",
+                TokenType.OpenBracket => "[",
+                TokenType.CloseBracket => "]",
+                TokenType.OutputOp => "!",
+                TokenType.InputOp => "?",
+                TokenType.Parallel => "|",
+                TokenType.Star => "*",
+                TokenType.Def => "=",
+                TokenType.Let => "let",
                 _ => throw new Exception($"Unexpected token type: {type}")
             };
         }

@@ -1,4 +1,8 @@
 ﻿using System;
+using PiServer.Services;
+using System.Text;
+using PiServer.version_2.interpreter.core;
+
 
 namespace PiServer.version_2.interpreter.core.syntax
 {
@@ -26,21 +30,88 @@ namespace PiServer.version_2.interpreter.core.syntax
             Continuation = continuation;
         }
 
+
+
         public override async Task ExecuteAsync(PiEnvironment env)
         {
-            string message;
-            try
+            Console.WriteLine($"*** OutputProcess.ExecuteAsync started ***");
+            Console.WriteLine($"Original message: '{Message}'");
+
+            string processedMessage = Message;
+
+            // Проверяем, является ли сообщение лямбда-выражением
+            if (string.IsNullOrEmpty(Message))
             {
-                message = env.GetVariable(Message); 
+                processedMessage = "null"; // или любое значение по умолчанию
             }
-            catch
+            else if (IsLambdaExpression(Message))
             {
-                message = Message; 
+                try
+                {
+                    Console.WriteLine($"Detected lambda expression, evaluating...");
+                    processedMessage = LambdaEvaluator.EvaluateLambda(Message);
+                    Console.WriteLine($"Lambda evaluation result: '{processedMessage}'");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lambda evaluation failed: {ex.Message}");
+                    // Пытаемся получить значение переменной
+                    try
+                    {
+                        processedMessage = env.GetVariable(Message) ?? Message;
+                        Console.WriteLine($"Using variable value: '{processedMessage}'");
+                    }
+                    catch
+                    {
+                        processedMessage = Message;
+                        Console.WriteLine($"Using original message: '{processedMessage}'");
+                    }
+                }
+            }
+            else
+            {
+                // Обычное сообщение
+                try
+                {
+                    processedMessage = env.GetVariable(Message) ?? Message;
+                    Console.WriteLine($"Using variable value: '{processedMessage}'");
+                }
+                catch
+                {
+                    processedMessage = Message;
+                    Console.WriteLine($"Using original message: '{processedMessage}'");
+                }
             }
 
-            await env.SendAsync(Channel, message);
+            Console.WriteLine($"Sending message: '{processedMessage}' via channel '{Channel}'");
+
+            try
+            {
+                await env.SendAsync(Channel, processedMessage);
+                Console.WriteLine($"Message sent successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending message: {ex.Message}");
+                throw;
+            }
+
+            Console.WriteLine($"Executing continuation: {Continuation}");
             await Continuation.ExecuteAsync(env);
+
+            Console.WriteLine($"*** OutputProcess.ExecuteAsync completed ***");
         }
+
+private bool IsLambdaExpression(string message)
+{
+    // Проверяем признаки лямбда-выражения
+    return !string.IsNullOrEmpty(message) && 
+           (message.Contains("fun") || 
+            message.Contains("->") || 
+            message.Contains("λ") || 
+            message.Contains("\\") ||
+            (message.Contains('(') && message.Contains(')')));
+}
 
         public override string ToString() => $"{Channel}![{Message}].{Continuation}";
     }
@@ -58,11 +129,48 @@ namespace PiServer.version_2.interpreter.core.syntax
             Continuation = continuation;
         }
 
+
         public override async Task ExecuteAsync(PiEnvironment env)
         {
-            var message = await env.ReceiveAsync(Channel);
-            env.SetVariable(Variable, message); 
-            await Continuation.ExecuteAsync(env);
+            Console.WriteLine($"*** InputProcess.ExecuteAsync started ***");
+            Console.WriteLine($"Waiting for message on channel: '{Channel}'");
+
+            try
+            {
+                string message = await env.ReceiveAsync(Channel);
+                Console.WriteLine($"Received message: '{message}'");
+
+                // Сохраняем в переменную
+                env.SetVariable(Variable, message);
+                Console.WriteLine($"Variable '{Variable}' set to: '{message}'");
+
+                Console.WriteLine($"Executing continuation: {Continuation}");
+                await Continuation.ExecuteAsync(env);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in InputProcess: {ex.Message}");
+                throw;
+            }
+
+            Console.WriteLine($"*** InputProcess.ExecuteAsync completed ***");
+        }
+
+
+
+        private string EvaluateLambda(string expression)
+        {
+            try
+            {
+                // Вместо упрощенной логики вызываем ваш мощный вычислитель
+                return LambdaEvaluator.EvaluateLambda(expression);
+            }
+            catch (Exception ex)
+            {
+                // Логируем ошибку, но возвращаем оригинальное выражение
+                Console.WriteLine($"Lambda evaluation failed: {ex.Message}");
+                return expression;
+            }
         }
 
         private Process Substitute(Process process, string variable, string value)
@@ -149,5 +257,92 @@ namespace PiServer.version_2.interpreter.core.syntax
         }
 
         public override string ToString() => $"let {ResultVar} = ({Lambda}) {ArgumentVar}.{Continuation}";
+    }
+
+
+    public static class LambdaMessageProcessor
+    {
+        public static string ProcessLambdaInMessage(string message, PiEnvironment env)
+        {
+            // Проверяем, содержит ли сообщение лямбда-выражение
+            if (IsLambdaExpression(message))
+            {
+                try
+                {
+                    // Используем ваш мощный вычислитель
+                    return LambdaEvaluator.EvaluateLambda(message);
+                }
+                catch
+                {
+                    // Если не удалось вычислить, возвращаем как есть
+                    return message;
+                }
+            }
+
+            // Пытаемся получить значение переменной
+            try
+            {
+                return env.GetVariable(message) ?? message;
+            }
+            catch
+            {
+                return message;
+            }
+        }
+
+
+
+        private static bool IsLambdaExpression(string expression)
+        {
+            return expression.Contains("λ") ||
+                   expression.Contains("fun") ||
+                   expression.Contains("->") ||
+                   (expression.Contains('(') && expression.Contains(')'));
+        }
+    
+
+
+
+        private static string ExtractLambdaExpression(string message)
+        {
+            // Ищем начало лямбда-выражения
+            int lambdaIndex = message.IndexOf("λ", StringComparison.Ordinal);
+            if (lambdaIndex == -1)
+                lambdaIndex = message.IndexOf("\\", StringComparison.Ordinal);
+            if (lambdaIndex == -1) return message;
+
+            // Извлекаем лямбда-выражение
+            var sb = new StringBuilder();
+            int parenDepth = 0;
+            bool inLambda = false;
+
+            for (int i = lambdaIndex; i < message.Length; i++)
+            {
+                char c = message[i];
+
+                if (c == 'λ' || c == '\\')
+                {
+                    inLambda = true;
+                    sb.Append('λ');
+                    continue;
+                }
+
+                if (inLambda)
+                {
+                    if (c == '(') parenDepth++;
+                    if (c == ')') parenDepth--;
+
+                    sb.Append(c);
+
+                    // Завершаем, когда достигли конца выражения
+                    if (parenDepth == 0 && (c == ' ' || i == message.Length - 1))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return sb.ToString();
+        }
     }
 }

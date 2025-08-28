@@ -1,6 +1,8 @@
 ﻿using PiServer.version_2.interpreter.core;
 using PiServer.version_2.interpreter.core.syntax;
 using System.Text.Json.Serialization;
+using PiServer.Services;
+
 
 namespace PiServer.version_2.runtime
 {
@@ -26,113 +28,187 @@ namespace PiServer.version_2.runtime
                 _currentProcess = initialProcess;
             }
 
+
         public async Task<StepResult> ExecuteStepAsync()
         {
-            if (IsCompleted)
-                throw new InvalidOperationException("Process completed");
+            Console.WriteLine($"=== ExecuteStepAsync started ===");
+            Console.WriteLine($"Current process: {CurrentProcess}");
+            Console.WriteLine($"Is completed: {IsCompleted}");
 
-            if (_env == null)
-                throw new InvalidOperationException("Environment is not initialized");
-
-            var result = new StepResult
+            try
             {
-                // Инициализируем обязательные свойства
-                CurrentState = string.Empty,
-                LastAction = string.Empty,
-                Variables = new Dictionary<string, string>(),
-                ChannelStates = new Dictionary<string, List<string>>(),
-                ActiveRestrictions = new List<string>()
-            };
+                if (IsCompleted)
+                {
+                    Console.WriteLine("Process already completed");
+                    throw new InvalidOperationException("Process completed");
+                }
 
-            if (_currentProcess is ParallelProcess pp)
-            {
-                var (newProcess, comms) = await ExecuteParallelCommunications(pp);
-                _currentProcess = newProcess;
-                result.ParallelActions = comms ?? new List<string>();
-                result.LastAction = comms?.Count > 0 ? $"Parallel step ({comms.Count} actions)" : "No parallel actions";
+                if (_env == null)
+                {
+                    Console.WriteLine("Environment is null");
+                    throw new InvalidOperationException("Environment is not initialized");
+                }
+
+                var result = new StepResult
+                {
+                    CurrentState = string.Empty,
+                    LastAction = string.Empty,
+                    Variables = new Dictionary<string, string>(),
+                    ChannelStates = new Dictionary<string, List<string>>(),
+                    ActiveRestrictions = new List<string>()
+                };
+
+                // Обработка разных типов процессов
+                if (CurrentProcess is OutputProcess op)
+                {
+                    Console.WriteLine($"Executing OutputProcess: {op}");
+                    Console.WriteLine($"Channel: {op.Channel}, Message: {op.Message}");
+
+                    await op.ExecuteAsync(_env);
+                    _currentProcess = op.Continuation;
+                    result.LastAction = $"Sent '{op.Message}' to {op.Channel}";
+                }
+                else if (CurrentProcess is InputProcess ip)
+                {
+                    Console.WriteLine($"Executing InputProcess: {ip}");
+                    Console.WriteLine($"Channel: {ip.Channel}, Variable: {ip.Variable}");
+
+                    await ip.ExecuteAsync(_env);
+                    _currentProcess = ip.Continuation;
+                    result.LastAction = $"Received on {ip.Channel}";
+                }
+                else if (CurrentProcess is ParallelProcess pp)
+                {
+                    Console.WriteLine($"Executing ParallelProcess with {pp.Processes.Count} processes");
+                    var (newProcess, comms) = await ExecuteParallelCommunications(pp);
+                    _currentProcess = newProcess;
+                    result.LastAction = comms?.Count > 0 ? $"Parallel step ({comms.Count} actions)" : "No parallel actions";
+                    result.ParallelActions = comms ?? new List<string>();
+                }
+                else if (CurrentProcess is NullProcess)
+                {
+                    Console.WriteLine("Executing NullProcess");
+                    result.LastAction = "Null process";
+                }
+                else
+                {
+                    Console.WriteLine($"Unknown process type: {CurrentProcess.GetType()}");
+                    throw new InvalidOperationException($"Unknown process type: {CurrentProcess.GetType()}");
+                }
+
+                result.CurrentState = CurrentProcess?.ToString() ?? "Null state";
+                result.IsCompleted = IsCompleted;
+
+                Console.WriteLine($"Step completed. Last action: {result.LastAction}");
+                Console.WriteLine($"New state: {result.CurrentState}");
+                Console.WriteLine($"=== ExecuteStepAsync completed ===");
+
+                return result;
             }
-            else
+            catch (Exception ex)
             {
-                result.LastAction = GetActionType(_currentProcess) ?? "Unknown action";
-                await _currentProcess.ExecuteAsync(_env);
-                _currentProcess = GetNextProcess(_currentProcess) ?? throw new InvalidOperationException("Next process is null");
+                Console.WriteLine($"=== ExecuteStepAsync ERROR ===");
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner error: {ex.InnerException.Message}");
+                }
+                Console.WriteLine($"=== ExecuteStepAsync ERROR END ===");
+                throw;
             }
-
-            // Заполняем состояние процесса
-            result.CurrentState = _currentProcess?.ToString() ?? "Null state";
-            result.IsCompleted = IsCompleted;
-
-            // Заполняем окружение из PiEnvironment
-            if (_env.Variables != null)
-            {
-                result.Variables = _env.Variables.ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value
-                );
-            }
-
-            if (_env.Channels != null)
-            {
-                result.ChannelStates = _env.Channels.ToDictionary(
-                    channel => channel.Key,
-                    channel => new PiServer.version_2.runtime.Channel("temp").GetMessages()?.ToList() ?? new List<string>()
-                );
-            }
-
-            // Предполагая, что добавили это свойство в PiEnvironment
-            if (_env.ActiveRestrictions != null)
-            {
-                result.ActiveRestrictions = _env.ActiveRestrictions.ToList();
-            }
-
-            return result;
         }
+
+       
 
         private async Task<(Process NewProcess, List<string> Communications)> ExecuteParallelCommunications(ParallelProcess pp)
         {
             var continuations = new List<Process>();
             var communications = new List<string>();
 
-            // Группируем процессы по типам
+            // Создаем КОПИИ списков для безопасной модификации
+            var outputs = pp.Processes.OfType<OutputProcess>().ToList();
+            var inputs = pp.Processes.OfType<InputProcess>().ToList();
             var lets = pp.Processes.OfType<LetProcess>().ToList();
 
-            var outputs = pp.Processes
-                .Where(p => p is OutputProcess && !(p is LetProcess))
-                .Cast<OutputProcess>()
-                .ToList();
+            Console.WriteLine($"Parallel communications: {outputs.Count} outputs, {inputs.Count} inputs, {lets.Count} lets");
 
-            var inputs = pp.Processes
-                .Where(p => p is InputProcess && !(p is LetProcess))
-                .Cast<InputProcess>()
-                .ToList();
-
-            // 1. Выполняем все возможные коммуникации
-            foreach (var op in outputs.ToList())
+            // 1. Сначала выполняем все Let процессы
+            foreach (var let in lets)
             {
-                var matchingInput = inputs.FirstOrDefault(ip => ip.Channel == op.Channel);
-                if (matchingInput != null)
+                try
                 {
-                    string message = _env.GetVariable(op.Message);
-                    await _env.SendAsync(op.Channel, message);
-                    communications.Add($"Sent '{message}' via {op.Channel}");
-
-                    continuations.Add(Substitute(matchingInput.Continuation, matchingInput.Variable, message));
-                    continuations.Add(op.Continuation);
-
-                    outputs.Remove(op);
-                    inputs.Remove(matchingInput);
+                    Console.WriteLine($"Executing Let process: {let}");
+                    await let.ExecuteAsync(_env);
+                    continuations.Add(let.Continuation);
+                    communications.Add($"Computed {let.ResultVar} = {let.Lambda}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Let process failed: {ex.Message}");
+                    continuations.Add(let); // Оставляем как есть при ошибке
                 }
             }
 
-            foreach (var let in lets)
+            // 2. Выполняем коммуникации между Output и Input процессами
+            var matchedOutputs = new List<OutputProcess>();
+            var matchedInputs = new List<InputProcess>();
+
+            foreach (var output in outputs)
             {
-                await let.ExecuteAsync(_env);
-                continuations.Add(let.Continuation);
-                communications.Add($"Computed {let.ResultVar} = {let.Lambda}");
+                var matchingInput = inputs.FirstOrDefault(input =>
+                    input.Channel == output.Channel &&
+                    !matchedInputs.Contains(input));
+
+                if (matchingInput != null)
+                {
+                    try
+                    {
+                        Console.WriteLine($"Found matching pair: {output.Channel}");
+
+                        // Обрабатываем сообщение (возможно лямбда-выражение)
+                        string message = output.Message;
+                        if (IsLambdaExpression(message))
+                        {
+                            try
+                            {
+                                message = LambdaEvaluator.EvaluateLambda(message);
+                                Console.WriteLine($"Lambda evaluated: {output.Message} -> {message}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Lambda evaluation failed: {ex.Message}");
+                                // Используем оригинальное сообщение
+                            }
+                        }
+
+                        // Отправляем сообщение
+                        await _env.SendAsync(output.Channel, message);
+                        communications.Add($"Sent '{message}' via {output.Channel}");
+
+                        // Добавляем продолжения
+                        continuations.Add(output.Continuation);
+                        continuations.Add(Substitute(matchingInput.Continuation, matchingInput.Variable, message));
+
+                        // Помечаем как обработанные
+                        matchedOutputs.Add(output);
+                        matchedInputs.Add(matchingInput);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Communication failed: {ex.Message}");
+                        // Оставляем оба процесса для повторной попытки
+                        continuations.Add(output);
+                        continuations.Add(matchingInput);
+                    }
+                }
             }
 
-            continuations.AddRange(outputs);
-            continuations.AddRange(inputs);
+            // 3. Добавляем необработанные процессы
+            continuations.AddRange(outputs.Except(matchedOutputs));
+            continuations.AddRange(inputs.Except(matchedInputs));
+
+            Console.WriteLine($"Total continuations: {continuations.Count}");
 
             return (continuations.Count switch
             {
@@ -142,30 +218,41 @@ namespace PiServer.version_2.runtime
             }, communications);
         }
 
-        private Process Substitute(Process process, string variable, string value)
-            {
-                if (process is NullProcess) return process;
-                if (process is OutputProcess op)
-                    return new OutputProcess(
-                        op.Channel == variable ? value : op.Channel,
-                        op.Message == variable ? value : op.Message,
-                        Substitute(op.Continuation, variable, value));
 
-                if (process is InputProcess ip)
-                    return new InputProcess(
-                        ip.Channel == variable ? value : ip.Channel,
-                        ip.Variable,
-                        Substitute(ip.Continuation, variable, value));
-                if (process is LetProcess lp)
-                    return new LetProcess(
-                    lp.ResultVar,
-                    lp.Lambda,
-                    lp.ArgumentVar == variable ? value : lp.ArgumentVar, 
-                    Substitute(lp.Continuation, variable, value)
-                );
+        private bool IsLambdaExpression(string expression)
+        {
+            return !string.IsNullOrEmpty(expression) &&
+                   (expression.Contains("fun") ||
+                    expression.Contains("->") ||
+                    expression.Contains("λ") ||
+                    expression.Contains("\\") ||
+                    (expression.Contains('(') && expression.Contains(')')));
+        }
+
+        private Process Substitute(Process process, string variable, string value)
+        {
+            if (process is NullProcess) return process;
+            if (process is OutputProcess op)
+                return new OutputProcess(
+                    op.Channel == variable ? value : op.Channel,
+                    op.Message == variable ? value : op.Message,
+                    Substitute(op.Continuation, variable, value));
+
+            if (process is InputProcess ip)
+                return new InputProcess(
+                    ip.Channel == variable ? value : ip.Channel,
+                    ip.Variable,
+                    Substitute(ip.Continuation, variable, value));
+            if (process is LetProcess lp)
+                return new LetProcess(
+                lp.ResultVar,
+                lp.Lambda,
+                lp.ArgumentVar == variable ? value : lp.ArgumentVar,
+                Substitute(lp.Continuation, variable, value)
+            );
 
             return process;
-            }
+        }
 
         private string GetActionType(Process process)
         {

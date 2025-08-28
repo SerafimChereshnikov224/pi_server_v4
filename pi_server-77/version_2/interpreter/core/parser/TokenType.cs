@@ -19,9 +19,17 @@
             Identifier,
             EndOfInput,
 
+            Number,
+            Plus,
+            Minus,
+            Multiply,
+            Divide,
+
             Lambda,
             
             Arrow, //->
+
+            Fun,
 
             Def, //:=
 

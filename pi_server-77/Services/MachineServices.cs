@@ -43,64 +43,66 @@ namespace PiServer.Services
 
     public static class LambdaEvaluator
     {
-public static object EvaluateLambda(string lambdaExpression)
-{
-    var machineBundle = MachineSelector.GetMachineByName("CAM");
-    if (machineBundle == null)
-    {
-        throw new InvalidOperationException("CAM machine bundle is not available");
-    }
 
-    var parsed = machineBundle.Parse(lambdaExpression);
-    var compiled = machineBundle.Compile(parsed);
-    var resultState = machineBundle.Machine!.EvaluateCode(compiled, false);
-
-    // Получаем результат как в оригинальном коде
-    return GetResultFromMachineState(resultState, machineBundle.Machine);
-}
-
-private static object GetResultFromMachineState(IMachineState machineState, IAbstractMachine machine)
-{
-    // Пробуем основные регистры, где обычно хранится результат
-    string[] resultRegisters = { "ACC", "RESULT", "R0", "value", "output" };
-    
-    foreach (var registerName in resultRegisters)
-    {
-        try
+        public static string EvaluateLambda(string lambdaExpression)
         {
-            // Используем тот же метод, что и в оригинальном коде
-            string value = machineState.GetRegisterStringValue(registerName);
-            if (!string.IsNullOrEmpty(value) && value != "null" && value != "0")
+            var machineBundle = MachineSelector.GetMachineByName("CAM");
+            if (machineBundle == null)
             {
-                return value;
+                throw new InvalidOperationException("CAM machine bundle is not available");
             }
+
+            var parsed = machineBundle.Parse(lambdaExpression);
+            var compiled = machineBundle.Compile(parsed);
+            var resultState = machineBundle.Machine!.EvaluateCode(compiled, false);
+
+            // Получаем результат как в оригинальном коде
+            return GetResultFromMachineState(resultState, machineBundle.Machine);
         }
-        catch
+
+
+        private static string GetResultFromMachineState(IMachineState machineState, IAbstractMachine machine)
         {
-            // Регистр может не существовать, продолжаем поиск
-        }
-    }
-    
-    // Если не нашли в конкретных регистрах, проверяем все доступные регистры
-    foreach (var register in machine.Registers)
-    {
-        try
-        {
-            string value = machineState.GetRegisterStringValue(register.Name);
-            if (!string.IsNullOrEmpty(value) && value != "null" && value != "0")
+            // Пробуем основные регистры, где обычно хранится результат
+            string[] resultRegisters = { "ACC", "RESULT", "R0", "value", "output" };
+
+            foreach (var registerName in resultRegisters)
             {
-                return value;
+                try
+                {
+                    // Используем тот же метод, что и в оригинальном коде
+                    string value = machineState.GetRegisterStringValue(registerName);
+                    if (!string.IsNullOrEmpty(value) && value != "null" && value != "0")
+                    {
+                        return value;
+                    }
+                }
+                catch
+                {
+                    // Регистр может не существовать, продолжаем поиск
+                }
             }
+
+            // Если не нашли в конкретных регистрах, проверяем все доступные регистры
+            foreach (var register in machine.Registers)
+            {
+                try
+                {
+                    string value = machineState.GetRegisterStringValue(register.Name);
+                    if (!string.IsNullOrEmpty(value) && value != "null" && value != "0")
+                    {
+                        return value;
+                    }
+                }
+                catch
+                {
+                    // Пропускаем недоступные регистры
+                }
+            }
+
+            // Если ничего не нашли, возвращаем строковое представление состояния
+            return machineState.ToString();
         }
-        catch
-        {
-            // Пропускаем недоступные регистры
-        }
-    }
-    
-    // Если ничего не нашли, возвращаем строковое представление состояния
-    return machineState.ToString();
-}
 
 
 
