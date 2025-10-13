@@ -56,21 +56,18 @@ namespace PiServer.Services
             var compiled = machineBundle.Compile(parsed);
             var resultState = machineBundle.Machine!.EvaluateCode(compiled, false);
 
-            // Получаем результат как в оригинальном коде
             return GetResultFromMachineState(resultState, machineBundle.Machine);
         }
 
 
         private static string GetResultFromMachineState(IMachineState machineState, IAbstractMachine machine)
         {
-            // Пробуем основные регистры, где обычно хранится результат
             string[] resultRegisters = { "ACC", "RESULT", "R0", "value", "output" };
 
             foreach (var registerName in resultRegisters)
             {
                 try
                 {
-                    // Используем тот же метод, что и в оригинальном коде
                     string value = machineState.GetRegisterStringValue(registerName);
                     if (!string.IsNullOrEmpty(value) && value != "null" && value != "0")
                     {
@@ -79,11 +76,9 @@ namespace PiServer.Services
                 }
                 catch
                 {
-                    // Регистр может не существовать, продолжаем поиск
                 }
             }
 
-            // Если не нашли в конкретных регистрах, проверяем все доступные регистры
             foreach (var register in machine.Registers)
             {
                 try
@@ -96,23 +91,18 @@ namespace PiServer.Services
                 }
                 catch
                 {
-                    // Пропускаем недоступные регистры
                 }
             }
 
-            // Если ничего не нашли, возвращаем строковое представление состояния
             return machineState.ToString();
         }
 
 
 
-        // Вспомогательные методы для работы с регистрами
         private static IEnumerable<string> GetRegisterNames(IMachineState machineState)
         {
-            // Попробуйте разные методы доступа к регистрам
             try
             {
-                // Если есть метод GetRegisterNames
                 return machineState.GetType().GetMethod("GetRegisterNames")?.Invoke(machineState, null) as IEnumerable<string> 
                     ?? new[] { "result", "output", "value", "r0", "r1" };
             }
@@ -126,7 +116,6 @@ namespace PiServer.Services
         {
             try
             {
-                // Если есть метод GetRegister
                 return machineState.GetType().GetMethod("GetRegister")?.Invoke(machineState, new object[] { registerName })
                     ?? machineState.GetType().GetProperty(registerName)?.GetValue(machineState);
             }

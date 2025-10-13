@@ -126,14 +126,12 @@ namespace PiServer.version_2.runtime
             var continuations = new List<Process>();
             var communications = new List<string>();
 
-            // Создаем КОПИИ списков для безопасной модификации
             var outputs = pp.Processes.OfType<OutputProcess>().ToList();
             var inputs = pp.Processes.OfType<InputProcess>().ToList();
             var lets = pp.Processes.OfType<LetProcess>().ToList();
 
             Console.WriteLine($"Parallel communications: {outputs.Count} outputs, {inputs.Count} inputs, {lets.Count} lets");
 
-            // 1. Сначала выполняем все Let процессы
             foreach (var let in lets)
             {
                 try
@@ -146,11 +144,10 @@ namespace PiServer.version_2.runtime
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Let process failed: {ex.Message}");
-                    continuations.Add(let); // Оставляем как есть при ошибке
+                    continuations.Add(let); 
                 }
             }
 
-            // 2. Выполняем коммуникации между Output и Input процессами
             var matchedOutputs = new List<OutputProcess>();
             var matchedInputs = new List<InputProcess>();
 
@@ -166,7 +163,6 @@ namespace PiServer.version_2.runtime
                     {
                         Console.WriteLine($"Found matching pair: {output.Channel}");
 
-                        // Обрабатываем сообщение (возможно лямбда-выражение)
                         string message = output.Message;
                         if (IsLambdaExpression(message))
                         {
@@ -178,33 +174,27 @@ namespace PiServer.version_2.runtime
                             catch (Exception ex)
                             {
                                 Console.WriteLine($"Lambda evaluation failed: {ex.Message}");
-                                // Используем оригинальное сообщение
                             }
                         }
 
-                        // Отправляем сообщение
                         await _env.SendAsync(output.Channel, message);
                         communications.Add($"Sent '{message}' via {output.Channel}");
 
-                        // Добавляем продолжения
                         continuations.Add(output.Continuation);
                         continuations.Add(Substitute(matchingInput.Continuation, matchingInput.Variable, message));
 
-                        // Помечаем как обработанные
                         matchedOutputs.Add(output);
                         matchedInputs.Add(matchingInput);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Communication failed: {ex.Message}");
-                        // Оставляем оба процесса для повторной попытки
                         continuations.Add(output);
                         continuations.Add(matchingInput);
                     }
                 }
             }
 
-            // 3. Добавляем необработанные процессы
             continuations.AddRange(outputs.Except(matchedOutputs));
             continuations.AddRange(inputs.Except(matchedInputs));
 

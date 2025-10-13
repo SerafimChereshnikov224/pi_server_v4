@@ -72,7 +72,6 @@ namespace PiServer.version_2.interpreter.core.parser
             var channel = _currentToken.Value;
             Eat(TokenType.Identifier);
 
-            // Если после идентификатора не идет действие, считаем это нулевым процессом
             if (_currentToken.Type != TokenType.OutputOp && _currentToken.Type != TokenType.InputOp)
                 return new NullProcess();
 
@@ -88,7 +87,6 @@ namespace PiServer.version_2.interpreter.core.parser
             Eat(TokenType.OutputOp);
             Eat(TokenType.OpenBracket);
             
-            // Полностью переработанный метод чтения сообщения
             string message = ReadMessageContent();
             
             Eat(TokenType.CloseBracket);
@@ -102,10 +100,10 @@ namespace PiServer.version_2.interpreter.core.parser
             if (_currentToken.Type == TokenType.CloseBracket)
             {
                 Eat(TokenType.CloseBracket);
-                return ""; // Пустое сообщение
+                return ""; 
             }
             var sb = new StringBuilder();
-            int depth = 1; // Учитываем уже открытую скобку [
+            int depth = 1; 
 
             while (depth > 0 && _currentToken.Type != TokenType.EndOfInput)
             {
@@ -113,14 +111,13 @@ namespace PiServer.version_2.interpreter.core.parser
                 {
                     sb.Append(" ");
                 }
-                // Просто собираем все содержимое как строку
                 switch (_currentToken.Type)
                 {
                     case TokenType.Identifier:
                         sb.Append(_currentToken.Value);
                         break;
                     case TokenType.Number:
-                        sb.Append(_currentToken.Value); // Добавьте эту строку
+                        sb.Append(_currentToken.Value); 
                         break;
                     case TokenType.Lambda:
                         sb.Append("\\");
@@ -153,14 +150,12 @@ namespace PiServer.version_2.interpreter.core.parser
                         sb.Append("/");
                         break;
                     default:
-                        // Для всех остальных токенов используем их строковое представление
                         sb.Append(GetTokenSymbol(_currentToken.Type));
                         break;
                 }
 
                 _currentToken = _lexer.NextToken();
 
-                // Обновляем глубину для вложенных скобок
                 if (_currentToken.Type == TokenType.OpenBracket) depth++;
                 if (_currentToken.Type == TokenType.CloseBracket) depth--;
 
@@ -175,7 +170,7 @@ namespace PiServer.version_2.interpreter.core.parser
         {
             return type switch
             {
-                TokenType.Number => "", // будет обработано в основном методе
+                TokenType.Number => "", 
                 TokenType.Plus => "+",
                 TokenType.Minus => "-",
                 TokenType.Multiply => "*",
@@ -241,12 +236,12 @@ namespace PiServer.version_2.interpreter.core.parser
         private Process ParseBracedRestriction()
         {
             Eat(TokenType.OpenBrace);
-            Eat(TokenType.Star); // Обязательно должен быть *
+            Eat(TokenType.Star); 
 
             var name = _currentToken.Value;
             Eat(TokenType.Identifier);
 
-            Eat(TokenType.CloseBrace); // Закрывающая скобка
+            Eat(TokenType.CloseBrace); 
 
             return new RestrictionProcess(name, ParseExpression());
         }
@@ -261,7 +256,7 @@ namespace PiServer.version_2.interpreter.core.parser
         {
             Eat(TokenType.OpenBrace);
 
-            // Если внутри фигурных скобок идет ограничение (*)
+
             if (_currentToken.Type == TokenType.Star)
             {
                 var restriction = ParseRestriction();
@@ -269,7 +264,6 @@ namespace PiServer.version_2.interpreter.core.parser
                 return restriction;
             }
 
-            // Иначе обрабатываем как обычное выражение в скобках
             var process = ParseExpression();
             Eat(TokenType.CloseBrace);
             return process;

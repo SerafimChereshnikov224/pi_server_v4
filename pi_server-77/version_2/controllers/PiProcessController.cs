@@ -4,7 +4,7 @@ using PiServer.version_2.models;
 using PiServer.version_2.runtime;
 // using PiServer.version_2.services;
 using System.Collections.Concurrent;
-using PiServer.Services; // Используйте вашу локальную версию
+using PiServer.Services; 
 using System.Text.Json;
 
 
@@ -120,14 +120,7 @@ namespace PiServer.version_2.controllers
         public string Expression { get; set; }
     }
 
-    public class LambdaResponse
-    {
-        public bool Success { get; set; }
-        public object Result { get; set; }
-        public string Expression { get; set; }
-        public string Error { get; set; }
-        public string ResultType { get; set; }
-    }
+
 
 
 
