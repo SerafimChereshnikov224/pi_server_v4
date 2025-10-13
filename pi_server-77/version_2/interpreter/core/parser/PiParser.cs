@@ -3,6 +3,8 @@ using PiServer.version_2.interpreter.core.syntax;
 using System;
 using System.Text;
 using System.Collections.Generic;
+using PiServer.Services; 
+
 
 namespace PiServer.version_2.interpreter.core.parser
 {
@@ -10,6 +12,7 @@ namespace PiServer.version_2.interpreter.core.parser
     {
         private readonly Lexer _lexer;
         private Token _currentToken;
+
 
         public PiParser(string input)
         {
@@ -43,6 +46,7 @@ namespace PiServer.version_2.interpreter.core.parser
                 ? processes[0]
                 : new ParallelProcess(processes);
         }
+        
 
         private Process ParseSingleProcess()
         {
@@ -50,21 +54,16 @@ namespace PiServer.version_2.interpreter.core.parser
             {
                 case TokenType.NullProcess:
                     return ParseNull();
-
-                // case TokenType.OpenParen:
-                //     return ParseInput(); // Только для ограничений
-
                 case TokenType.OpenBrace:
-                    return ParseBracedRestriction(); // Только для ограничений
-
+                    return ParseBracedRestriction();
                 case TokenType.OpenParen:
                     return ParseParenthesized();
-
                 case TokenType.Identifier:
                     return ParseAction();
-
+                case TokenType.Let:
+                    return ParseLet();
                 default:
-                    throw new Exception($"Unexpected token: {_currentToken.Type} at position {_currentToken.Position}");
+                    throw new Exception($"Unexpected token: {_currentToken.Type}");
             }
         }
 
@@ -73,7 +72,6 @@ namespace PiServer.version_2.interpreter.core.parser
             var channel = _currentToken.Value;
             Eat(TokenType.Identifier);
 
-            // Если после идентификатора не идет действие, считаем это нулевым процессом
             if (_currentToken.Type != TokenType.OutputOp && _currentToken.Type != TokenType.InputOp)
                 return new NullProcess();
 
@@ -84,41 +82,11 @@ namespace PiServer.version_2.interpreter.core.parser
         }
 
 
-        // private Process ParseOutput(string channel)
-        // {
-        //     Eat(TokenType.OutputOp);
-        //     Eat(TokenType.OpenBracket);
-
-        //     // Новый метод определения типа сообщения
-        //     string message = ParseMessage(); 
-
-        //     Eat(TokenType.CloseBracket);
-        //     Eat(TokenType.Dot);
-        //     return new OutputProcess(channel, message, ParseSingleProcess());
-        // }
-
-        // private string ParseMessage()
-        // {
-        //     if (_currentToken.Type == TokenType.Lambda)
-        //     {
-        //         LambdaTerm term = ParseLambdaTerm();
-        //         return term.ToString(); // Возвращаем LambdaTerm
-        //     }
-        //     else if (_currentToken.Type == TokenType.Identifier)
-        //     {
-        //         string value = _currentToken.Value;
-        //         Eat(TokenType.Identifier);
-        //         return value; // Возвращаем строку
-        //     }
-        //     throw new Exception($"Invalid message format at position {_currentToken.Position}");
-        // }
-
         private Process ParseOutput(string channel)
         {
             Eat(TokenType.OutputOp);
             Eat(TokenType.OpenBracket);
             
-            // Полностью переработанный метод чтения сообщения
             string message = ReadMessageContent();
             
             Eat(TokenType.CloseBracket);
@@ -126,82 +94,105 @@ namespace PiServer.version_2.interpreter.core.parser
             return new OutputProcess(channel, message, ParseSingleProcess());
         }
 
+
         private string ReadMessageContent()
         {
+            if (_currentToken.Type == TokenType.CloseBracket)
+            {
+                Eat(TokenType.CloseBracket);
+                return ""; 
+            }
             var sb = new StringBuilder();
-            int depth = 1; // Учитываем уже открытую скобку [
-            
+            int depth = 1; 
+
             while (depth > 0 && _currentToken.Type != TokenType.EndOfInput)
             {
-                // Обрабатываем вложенные структуры
+                if (sb.Length > 0) 
+                {
+                    sb.Append(" ");
+                }
+                switch (_currentToken.Type)
+                {
+                    case TokenType.Identifier:
+                        sb.Append(_currentToken.Value);
+                        break;
+                    case TokenType.Number:
+                        sb.Append(_currentToken.Value); 
+                        break;
+                    case TokenType.Lambda:
+                        sb.Append("\\");
+                        break;
+                    case TokenType.Fun:
+                        sb.Append("fun");
+                        break;
+                    case TokenType.Arrow:
+                        sb.Append("->");
+                        break;
+                    case TokenType.Dot:
+                        sb.Append(".");
+                        break;
+                    case TokenType.OpenParen:
+                        sb.Append("(");
+                        break;
+                    case TokenType.CloseParen:
+                        sb.Append(")");
+                        break;
+                    case TokenType.Plus:
+                        sb.Append("+");
+                        break;
+                    case TokenType.Minus:
+                        sb.Append("-");
+                        break;
+                    case TokenType.Multiply:
+                        sb.Append("*");
+                        break;
+                    case TokenType.Divide:
+                        sb.Append("/");
+                        break;
+                    default:
+                        sb.Append(GetTokenSymbol(_currentToken.Type));
+                        break;
+                }
+
+                _currentToken = _lexer.NextToken();
+
                 if (_currentToken.Type == TokenType.OpenBracket) depth++;
                 if (_currentToken.Type == TokenType.CloseBracket) depth--;
-                
+
                 if (depth == 0) break;
-                
-                // Добавляем содержимое токена
-                sb.Append(_currentToken.Type == TokenType.Identifier 
-                    ? _currentToken.Value 
-                    : GetTokenSymbol(_currentToken.Type));
-                
-                _currentToken = _lexer.NextToken();
             }
-            
+
             return sb.ToString();
         }
+
 
         private string GetTokenSymbol(TokenType type)
         {
             return type switch
             {
+                TokenType.Number => "", 
+                TokenType.Plus => "+",
+                TokenType.Minus => "-",
+                TokenType.Multiply => "*",
+                TokenType.Divide => "/",
                 TokenType.Lambda => "λ",
+                TokenType.Fun => "fun",
+                TokenType.Arrow => "->",
                 TokenType.Dot => ".",
                 TokenType.OpenParen => "(",
                 TokenType.CloseParen => ")",
+                TokenType.OpenBracket => "[",
+                TokenType.CloseBracket => "]",
+                TokenType.OutputOp => "!",
+                TokenType.InputOp => "?",
+                TokenType.Parallel => "|",
+                TokenType.Star => "*",
+                TokenType.Def => "=",
+                TokenType.Let => "let",
                 _ => throw new Exception($"Unexpected token type: {type}")
             };
         }
                 
-
-        // private LambdaTerm ParseLambdaTerm()
-        // {
-        //     Eat(TokenType.Lambda);
-        //     var param = _currentToken.Value;
-        //     Eat(TokenType.Identifier);
-        //     Eat(TokenType.Dot);
-        //     return new LambdaAbs(param, ParseLambdaExpression());
-        // }
-
-        // private LambdaTerm ParseLambdaExpression()
-        // {
-        //     var term = ParseLambdaAtom();
-        //     while (_currentToken.Type == TokenType.Identifier || 
-        //         _currentToken.Type == TokenType.OpenParen)
-        //     {
-        //         term = new LambdaApp(term, ParseLambdaAtom());
-        //     }
-        //     return term;
-        // }
-
-        // private LambdaTerm ParseLambdaAtom()
-        // {
-        //     if (_currentToken.Type == TokenType.OpenParen)
-        //     {
-        //         Eat(TokenType.OpenParen);
-        //         var term = ParseLambdaExpression();
-        //         Eat(TokenType.CloseParen);
-        //         return term;
-        //     }
-        //     var varName = _currentToken.Value;
-        //     Eat(TokenType.Identifier);
-        //     return new LambdaVar(varName);
-        // }
-
-
-
-
-        //
-        //
 
         private Process ParseInput(string channel)
         {
@@ -245,12 +236,12 @@ namespace PiServer.version_2.interpreter.core.parser
         private Process ParseBracedRestriction()
         {
             Eat(TokenType.OpenBrace);
-            Eat(TokenType.Star); // Обязательно должен быть *
+            Eat(TokenType.Star); 
 
             var name = _currentToken.Value;
             Eat(TokenType.Identifier);
 
-            Eat(TokenType.CloseBrace); // Закрывающая скобка
+            Eat(TokenType.CloseBrace); 
 
             return new RestrictionProcess(name, ParseExpression());
         }
@@ -265,7 +256,7 @@ namespace PiServer.version_2.interpreter.core.parser
         {
             Eat(TokenType.OpenBrace);
 
-            // Если внутри фигурных скобок идет ограничение (*)
+
             if (_currentToken.Type == TokenType.Star)
             {
                 var restriction = ParseRestriction();
@@ -273,11 +264,39 @@ namespace PiServer.version_2.interpreter.core.parser
                 return restriction;
             }
 
-            // Иначе обрабатываем как обычное выражение в скобках
             var process = ParseExpression();
             Eat(TokenType.CloseBrace);
             return process;
         }
+
+        private Process ParseLet()
+        {
+            Eat(TokenType.Let);
+            string varName = _currentToken.Value;
+            Eat(TokenType.Identifier);
+
+            Eat(TokenType.Def);
+
+            Eat(TokenType.OpenParen);
+
+            LambdaTerm term = ParseLambdaTerm();
+
+            Eat(TokenType.CloseParen);
+
+            string argVar = _currentToken.Value;
+            Eat(TokenType.Identifier);
+
+            Eat(TokenType.Dot);
+
+            return new LetProcess(
+                varName,
+                term,
+                argVar,
+                ParseSingleProcess()
+            );
+        }
+
+
 
         private void Eat(TokenType type)
         {
@@ -289,6 +308,40 @@ namespace PiServer.version_2.interpreter.core.parser
             {
                 throw new Exception($"Expected {type}, got {_currentToken.Type} at position {_currentToken.Position}");
             }
+        }
+
+        private LambdaTerm ParseLambdaTerm()
+        {
+            if (_currentToken.Type == TokenType.Lambda)
+            {
+                Eat(TokenType.Lambda);
+                string param = _currentToken.Value;
+                Eat(TokenType.Identifier);
+                Eat(TokenType.Dot);
+                return new LambdaAbs(param, ParseLambdaTerm());
+            }
+
+            var term = ParseLambdaAtom();
+            while (_currentToken.Type == TokenType.Identifier || _currentToken.Type == TokenType.OpenParen)
+            {
+                term = new LambdaApp(term, ParseLambdaAtom());
+            }
+            return term;
+        }
+
+        private LambdaTerm ParseLambdaAtom()
+        {
+            if (_currentToken.Type == TokenType.OpenParen)
+            {
+                Eat(TokenType.OpenParen);
+                var term = ParseLambdaTerm();
+                Eat(TokenType.CloseParen);
+                return term;
+            }
+
+            string varName = _currentToken.Value;
+            Eat(TokenType.Identifier);
+            return new LambdaVar(varName);
         }
     }
 }

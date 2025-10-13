@@ -4,6 +4,7 @@
     {
         public string Name { get; }
         private readonly Queue<string> _messages = new();
+        private readonly Queue<TaskCompletionSource<string>> _waitingReceivers = new();
 
         public Channel(string name) => Name = name;
 
@@ -15,6 +16,11 @@
         public bool TryReceive(out string message)
         {
             return _messages.TryDequeue(out message);
+        }
+
+        public IEnumerable<string> GetMessages()
+        {
+            return _messages.ToArray(); 
         }
     }
 }

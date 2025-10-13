@@ -35,6 +35,9 @@ public class Lexer
             case '?': _position++; return new Token(TokenType.InputOp, position: startPos);
             case '!': _position++; return new Token(TokenType.OutputOp, position: startPos);
             case 'ν': _position++; return new Token(TokenType.Star, position: startPos);
+            case '=':
+                _position++;
+                return new Token(TokenType.Def, position: startPos);
 
             //λ-calculus
             case 'λ':
@@ -48,13 +51,46 @@ public class Lexer
                     return new Token(TokenType.Def, position: startPos);
                 }
                 break;
-            case '-':
-                if (Peek() == '>')
+            case '-': 
+                if (Peek() == '>') // стрелка ->
                 {
                     _position += 2;
                     return new Token(TokenType.Arrow, position: startPos);
                 }
-                break;
+                _position++;
+                return new Token(TokenType.Minus, position: startPos);
+            case char c when char.IsDigit(c):
+                var numStart = _position;
+                while (_position < _input.Length && char.IsDigit(_input[_position]))
+                    _position++;
+                return new Token(TokenType.Number, _input.Substring(numStart, _position - numStart), numStart);
+
+            case '+': _position++; return new Token(TokenType.Plus, position: startPos);
+   
+            case '/': _position++; return new Token(TokenType.Divide, position: startPos);
+        }
+
+
+        if (current == 'f' && Peek() == 'u' && Peek(2) == 'n')
+        {
+            _position += 3;
+            return new Token(TokenType.Fun, position: startPos);
+        }
+
+        // Распознавание ->
+
+        if (current == '-' && Peek() == '>')
+        {
+            _position += 2;
+            return new Token(TokenType.Arrow, position: startPos);
+        }
+
+        // Распознавание λ
+
+        if (current == 'λ' || current == '\\')
+        {
+            _position += 1;
+            return new Token(TokenType.Lambda, position: startPos);
         }
 
         if (current == 'l' && Peek() == 'e' && Peek(2) == 't')

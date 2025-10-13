@@ -12,16 +12,24 @@
             OpenBracket,    // [
             CloseBracket,   // ]
             Parallel,       // |
-            Star,           // * (бывший Restriction)
+            Star,           // * 
             Dot,            // .
             InputOp,        // ?
             OutputOp,       // !
             Identifier,
             EndOfInput,
 
-            Lambda,
+            Number,
+            Plus,
+            Minus,
+            Multiply,
+            Divide,
 
+            Lambda,
+            
             Arrow, //->
+
+            Fun,
 
             Def, //:=
 
