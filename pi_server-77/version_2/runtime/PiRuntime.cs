@@ -3,18 +3,18 @@ using PiServer.version_2.interpreter.core.syntax;
 using System.Text.Json.Serialization;
 using PiServer.Services;
 
-
 namespace PiServer.version_2.runtime
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-        public class PiRuntime
-        {
-            public readonly PiEnvironment _env = new();
-            private Process _currentProcess;
 
-            public Process CurrentProcess => _currentProcess;
+    public class PiRuntime
+    {
+        public readonly PiEnvironment _env = new();
+        private Process _currentProcess;
+
+        public Process CurrentProcess => _currentProcess;
 
         public bool IsCompleted => _currentProcess switch
         {
@@ -24,9 +24,10 @@ namespace PiServer.version_2.runtime
         };
 
         public PiRuntime(Process initialProcess)
-            {
-                _currentProcess = initialProcess;
-            }
+        {
+            _currentProcess = initialProcess;
+        }
+
 
 
         public async Task<StepResult> ExecuteStepAsync()
@@ -119,7 +120,7 @@ namespace PiServer.version_2.runtime
             }
         }
 
-       
+
 
         private async Task<(Process NewProcess, List<string> Communications)> ExecuteParallelCommunications(ParallelProcess pp)
         {
@@ -144,7 +145,7 @@ namespace PiServer.version_2.runtime
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Let process failed: {ex.Message}");
-                    continuations.Add(let); 
+                    continuations.Add(let);
                 }
             }
 
@@ -256,15 +257,15 @@ namespace PiServer.version_2.runtime
         }
 
         private Process GetNextProcess(Process process)
+        {
+            return process switch
             {
-                return process switch
-                {
-                    OutputProcess op => op.Continuation,
-                    InputProcess ip => ip.Continuation,
-                    LetProcess lp => lp.Continuation,
-                    _ => process
-                };
-            }
+                OutputProcess op => op.Continuation,
+                InputProcess ip => ip.Continuation,
+                LetProcess lp => lp.Continuation,
+                _ => process
+            };
+        }
 
         private string GetMessageValue(OutputProcess op)
         {
@@ -290,5 +291,3 @@ namespace PiServer.version_2.runtime
         public List<string> ActiveRestrictions { get; set; } = new();
     }
 }
-
-

@@ -1,17 +1,37 @@
-﻿namespace PiServer.version_2.models
+﻿// PiServer.version_2.models/ProcessModels.cs
+namespace PiServer.version_2.models
 {
-    // Запрос на создание процесса
-    public class CreateProcessRequest
+    public class ProcessRequest
     {
-        public string Definition { get; set; }  // Строка с процессом, например: "(νx)(x![z].0 | x?(y).y![x].0) | z?(v).v![v].0"
+        public string ProcessDefinition { get; set; }
     }
 
-    // Ответ с состоянием процесса
-    public class ProcessStateResponse
+    public class ProcessResponse
     {
-        public string Id { get; set; }          // ID процесса
-        public string CurrentState { get; set; } // Текущее состояние в виде строки
-        public string LastAction { get; set; }  // Последнее выполненное действие
-        public bool IsCompleted { get; set; }   // Завершен ли процесс
+        public string SessionId { get; set; }
+        public string CurrentState { get; set; }
+    }
+
+    public class ProcessState
+    {
+        public string CurrentState { get; set; }
+        public bool IsCompleted { get; set; }
+    }
+
+    public class LambdaRequest
+    {
+        public string Expression { get; set; }
+    }
+
+    // StepResult должен быть здесь, так как он используется в базовой логике
+    public class StepResult
+    {
+        public string CurrentState { get; set; } = string.Empty;
+        public string LastAction { get; set; } = string.Empty;
+        public bool IsCompleted { get; set; }
+        public List<string> ParallelActions { get; set; } = new();
+        public Dictionary<string, string> Variables { get; set; } = new();
+        public Dictionary<string, List<string>> ChannelStates { get; set; } = new();
+        public List<string> ActiveRestrictions { get; set; } = new();
     }
 }

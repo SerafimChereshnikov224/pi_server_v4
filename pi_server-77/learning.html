@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лямбда-тренажер</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005a87;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 3px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Лямбда-тренажер</h2>
+        
+        <div class="input-group">
+            <label>Введите лямбда-выражение:</label>
+            <textarea id="lambdaInput" rows="3">out![(fun x -> x * 2) 5].0 | out?(a).b![4].0</textarea>
+        </div>
+
+        <div>
+            <button id="startBtn" onclick="startLearning()">Начать обучение</button>
+            <button id="statusBtn" onclick="updateStatus()">Обновить статус</button>
+        </div>
+
+        <div class="status">
+            <strong>Текущее состояние</strong><br>
+            Состояние: <span id="state">-</span><br>
+            Подсказка: <span id="hint">-</span><br>
+            Ожидаемый ввод: <span id="expectedInput">-</span>
+        </div>
+
+        <div class="input-group">
+            <label>Ваш ответ:</label>
+            <input type="text" id="userAnswer" placeholder="Введите ваш ответ">
+        </div>
+
+        <button id="submitBtn" onclick="submitAnswer()" disabled>Отправить ответ</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let learningStarted = false;
+        const expectedAnswer = "0 | b![4].0";
+
+        function startLearning() {
+            learningStarted = true;
+            document.getElementById('state').textContent = 'Обучение начато';
+            document.getElementById('hint').textContent = 'Упростите выражение, применив редукцию';
+            document.getElementById('expectedInput').textContent = 'Упрощенное выражение';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('result').innerHTML = '';
+        }
+
+        function updateStatus() {
+            if (!learningStarted) {
+                alert('Сначала начните обучение!');
+                return;
+            }
+            document.getElementById('state').textContent = 'Ожидание ответа';
+        }
+
+        function submitAnswer() {
+            if (!learningStarted) {
+                alert('Сначала начните обучение!');
+                return;
+            }
+
+            const userAnswer = document.getElementById('userAnswer').value.trim();
+            
+            if (userAnswer === expectedAnswer) {
+                document.getElementById('result').innerHTML = '<p class="correct">✓ Правильно! Выражение упрощено верно.</p>';
+                document.getElementById('state').textContent = 'Завершено';
+            } else {
+                document.getElementById('result').innerHTML = '<p class="incorrect">✗ Неправильно. Попробуйте еще раз.</p>';
+            }
+        }
+
+        // Разблокировка кнопки отправки при вводе текста
+        document.getElementById('userAnswer').addEventListener('input', function() {
+            if (learningStarted && this.value.trim() !== '') {
+                document.getElementById('submitBtn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
