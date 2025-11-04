@@ -1,4 +1,4 @@
-﻿using PiServer.version_2.interpreter.core.parser.PiServer.version_2.interpreter.core.parser;
+﻿using PiServer.version_2.interpreter.core.parser;
 
 public class Lexer
 {
@@ -19,6 +19,30 @@ public class Lexer
 
         var startPos = _position;
         var current = _input[_position];
+
+         if (current == '!' && Peek() == '=')
+        {
+            _position += 2;
+            return new Token(TokenType.NotEquals, position: startPos);
+        }
+
+        if (current == '=' && Peek() == '=')
+        {
+            _position += 2;
+            return new Token(TokenType.Equals, position: startPos);
+        }
+
+        if (current == '-' && Peek() == '>')
+        {
+            _position += 2;
+            return new Token(TokenType.Arrow, position: startPos);
+        }
+
+        if (current == ':' && Peek() == '=')
+        {
+            _position += 2;
+            return new Token(TokenType.Def, position: startPos);
+        }
 
         switch (current)
         {
@@ -68,7 +92,13 @@ public class Lexer
             case '+': _position++; return new Token(TokenType.Plus, position: startPos);
    
             case '/': _position++; return new Token(TokenType.Divide, position: startPos);
-        }
+
+            case '>': _position++; return new Token(TokenType.GreaterThan, position: startPos);
+            case '<': _position++; return new Token(TokenType.LessThan, position: startPos);
+            default:
+                break;
+
+            }
 
 
         if (current == 'f' && Peek() == 'u' && Peek(2) == 'n')
@@ -99,6 +129,23 @@ public class Lexer
             return new Token(TokenType.Let, position: startPos);
         }
 
+
+        if (MatchKeyword("if"))
+            return new Token(TokenType.If, position: startPos);
+
+        if (MatchKeyword("then"))
+            return new Token(TokenType.Then, position: startPos);
+
+        if (MatchKeyword("else"))
+            return new Token(TokenType.Else, position: startPos);
+
+        if (MatchKeyword("true"))
+            return new Token(TokenType.True, position: startPos);
+
+        if (MatchKeyword("false"))
+            return new Token(TokenType.False, position: startPos);
+
+
         if (char.IsLetter(current))
         {
             var start = _position;
@@ -120,4 +167,20 @@ public class Lexer
         while (_position < _input.Length && char.IsWhiteSpace(_input[_position]))
             _position++;
     }
+    private bool MatchKeyword(string keyword)
+    {
+        if (_position + keyword.Length <= _input.Length &&
+            string.Compare(_input, _position, keyword, 0, keyword.Length, ignoreCase: false) == 0)
+        {
+            // Убедимся, что дальше не буква/цифра (чтобы "ifx" не считалось как "if")
+            if (_position + keyword.Length == _input.Length || 
+                !char.IsLetterOrDigit(_input[_position + keyword.Length]))
+            {
+                _position += keyword.Length;
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
