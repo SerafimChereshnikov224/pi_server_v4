@@ -279,37 +279,37 @@
 // app.MapControllers();
 // app.MapGet("/", () => "π-Calculus Server is running (HTTP only)!");
 
-// app.Run();
+//// app.Run();
 
 
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+//using System.Net;
+//using System.Security.Cryptography.X509Certificates;
+//using Microsoft.AspNetCore.Builder;
+//using Microsoft.AspNetCore.Hosting;
+//using Microsoft.Extensions.Hosting;
 
-var builder = WebApplication.CreateBuilder(args);
+//var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем необходимые сервисы
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.WriteIndented = true;
-        options.JsonSerializerOptions.PropertyNamingPolicy = null; // сохраняет имена свойств как есть
-    });
+//// Добавляем необходимые сервисы
+//builder.Services.AddControllers()
+//    .AddJsonOptions(options =>
+//    {
+//        options.JsonSerializerOptions.WriteIndented = true;
+//        options.JsonSerializerOptions.PropertyNamingPolicy = null; // сохраняет имена свойств как есть
+//    });
     
-var app = builder.Build();
+//var app = builder.Build();
 
-// Настраиваем обработку HTTPS
-// app.UseHttpsRedirection();
-builder.WebHost.UseUrls("http://localhost:8095");
-// Закомментируйте: app.UseHttpsRedirection();
+//// Настраиваем обработку HTTPS
+//// app.UseHttpsRedirection();
+//builder.WebHost.UseUrls("http://localhost:8095");
+//// Закомментируйте: app.UseHttpsRedirection();
 
-// Разрешаем все CORS запросы (только для разработки!)
-app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+//// Разрешаем все CORS запросы (только для разработки!)
+//app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-// Регистрируем маршруты контроллеров
-app.MapControllers();
+//// Регистрируем маршруты контроллеров
+//app.MapControllers();
 
-app.Run();
+//app.Run();
 
