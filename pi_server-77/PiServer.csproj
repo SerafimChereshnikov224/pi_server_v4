@@ -1,22 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Основные проекты -->
     <ProjectReference Include="..\omelea-plus\mace\src\Mace.Core\Mace.Core.csproj" />
     <ProjectReference Include="..\omelea-plus\mace\src\Mace.AbstractMachines.Cam\Mace.AbstractMachines.Cam.fsproj" />
     <ProjectReference Include="..\omelea-plus\race2\src\Mephi.Cybernetics.Race.Core\Mephi.Cybernetics.Race.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>
