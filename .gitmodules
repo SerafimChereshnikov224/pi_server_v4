@@ -1,0 +1,3 @@
+[submodule "omelea-plus"]
+	path = omelea-plus
+	url = https://gitlab.com/cyber.mephi/edu/omelea-plus.git
