@@ -143,6 +143,29 @@ namespace PiServer.version_2.interpreter.tests
                 Assert.IsType<InputProcess>(result);
             }
 
+            [Fact]
+            public void ParseBroadcastOutputProcess()
+            {
+                var parser = new PiParser("a!![msg].0");
+                var result = parser.Parse();
+
+                var output = Assert.IsType<OutputProcess>(result);
+                Assert.Equal("a", output.Channel);
+                Assert.Equal("msg", output.Message);
+                Assert.IsType<NullProcess>(output.Continuation);
+                Assert.True(output.IsBroadcast);
+            }
+
+            [Fact]
+            public void ParseNormalOutputProcess_IsNotBroadcast()
+            {
+                var parser = new PiParser("a![msg].0");
+                var result = parser.Parse();
+
+                var output = Assert.IsType<OutputProcess>(result);
+                Assert.False(output.IsBroadcast);
+            }
+
         }
 
         public class StepExecutionTests
@@ -243,8 +266,111 @@ namespace PiServer.version_2.interpreter.tests
             //     Assert.True(result.IsCompleted);
             // }
 
+            [Fact]
+            public async Task Broadcast_DeliversToAllWaitingReceivers()
+            {
+                // Процесс: broadcast по каналу a и два получателя
+                var parser = new PiParser("a!![hello].0 | a?(x).out1![x].0 | a?(y).out2![y].0");
+                var process = parser.Parse();
+                var session = new PiRuntimeSession(process);
 
+                var result = await session.ExecuteStepAsync();
 
+                // После одного шага broadcast должен доставить сообщение обоим,
+                // значит должны появиться out1![hello] и out2![hello]
+                Assert.False(result.IsCompleted);
+                Assert.Contains("out1![hello].0", result.CurrentState);
+                Assert.Contains("out2![hello].0", result.CurrentState);
+                Assert.DoesNotContain("a!![hello].0", result.CurrentState);
+                Assert.DoesNotContain("a?(x)", result.CurrentState);
+                Assert.DoesNotContain("a?(y)", result.CurrentState);
+            }
+
+            [Fact]
+            public async Task Broadcast_WithNoReceivers_LosesMessage()
+            {
+                System.Console.WriteLine("=== BROADCAST TEST RUNNING ===");
+                // Отправка broadcast без получателей: сообщение не сохраняется, процесс завершается
+                var parser = new PiParser("a!![hello].0");
+                var process = parser.Parse();
+                var session = new PiRuntimeSession(process);
+
+                var result = await session.ExecuteStepAsync();
+
+                Assert.True(result.IsCompleted);
+                Assert.Equal("0", result.CurrentState);
+            }
+
+            [Fact]
+            public async Task Broadcast_DoesNotAffectUnicastSemantics()
+            {
+                var parser = new PiParser("a!![broadcast].0 | a![unicast].0 | a?(x).p1![x].0 | a?(y).p2![y].0");
+                var process = parser.Parse();
+                var session = new PiRuntimeSession(process);
+
+                var result = await session.ExecuteStepAsync();
+
+                // Проверяем, что broadcast доставлен обоим получателям
+                Assert.Contains("p1![broadcast].0", result.CurrentState);
+                Assert.Contains("p2![broadcast].0", result.CurrentState);
+
+                // Unicast может либо доставиться одному из получателей, либо остаться невыполненным,
+                // если оба получателя уже заняты broadcast'ом. Оба варианта допустимы.
+                bool unicastExecuted = result.CurrentState.Contains("p1![unicast].0") ||
+                                       result.CurrentState.Contains("p2![unicast].0");
+                bool unicastRemained = result.CurrentState.Contains("a![unicast].0");
+                Assert.True(unicastExecuted || unicastRemained,
+                    "Unicast должен либо выполниться, либо остаться в виде невыполненного вывода");
+
+                // Проверяем, что исходный вывод broadcast исчез
+                Assert.DoesNotContain("a!![broadcast].0", result.CurrentState);
+            }
+
+            [Fact]
+            public async Task Broadcast_WithMultipleBroadcasts_HandlesCorrectly()
+            {
+                // Два broadcast подряд по разным каналам
+                var parser = new PiParser("a!![msg1].0 | b!![msg2].0 | a?(x).p![x].0 | b?(y).q![y].0");
+                var process = parser.Parse();
+                var session = new PiRuntimeSession(process);
+
+                var result = await session.ExecuteStepAsync();
+
+                Assert.Contains("p![msg1].0", result.CurrentState);
+                Assert.Contains("q![msg2].0", result.CurrentState);
+            }
+
+            [Fact]
+            public async Task Broadcast_WithLambdaMessage_EvaluatesCorrectly()
+            {
+                // Broadcast с лямбда-выражением в сообщении
+                var parser = new PiParser("a!![(fun x -> x + 1) 5].0 | a?(y).out![y].0 | a?(z).out2![z].0");
+                var process = parser.Parse();
+                var session = new PiRuntimeSession(process);
+
+                var result = await session.ExecuteStepAsync();
+
+                Assert.Contains("out![6].0", result.CurrentState);
+                Assert.Contains("out2![6].0", result.CurrentState);
+            }
+
+            [Fact]
+            public async Task Broadcast_WithComplexContinuations_ExecutesAllBranches()
+            {
+                // Получатели имеют сложные продолжения (if, parallel)
+                var parser = new PiParser("a!![10].0 | a?(x).if x > 5 then b![x].0 else 0 | a?(y).(c![y].0 | d![y].0)");
+                var process = parser.Parse();
+                var session = new PiRuntimeSession(process);
+
+                var result = await session.ExecuteStepAsync();
+
+                // После broadcast оба получателя активируются:
+                // первый: if (10 > 5) -> b![10].0
+                // второй: параллельный процесс c![10].0 | d![10].0
+                Assert.Contains("b![10].0", result.CurrentState);
+                Assert.Contains("c![10].0", result.CurrentState);
+                Assert.Contains("d![10].0", result.CurrentState);
+            }
         }
 
         public class LambdaParserTests

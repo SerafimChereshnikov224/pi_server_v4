@@ -15,15 +15,26 @@ namespace PiServer.version_2.runtime
         {
             Name = name;
         }
-        public async Task SendAsync(object message)
+        public async Task SendAsync(object message, bool broadcast = false)
         {
-            if (_waitingReceivers.TryDequeue(out var receiver))
+            if (broadcast)
             {
-                receiver.SetResult(message);
+                while (_waitingReceivers.TryDequeue(out var receiver))
+                {
+                    receiver.SetResult(message); // каждому своя копия
+                }
+                // Не сохраняем в очередь
             }
             else
             {
-                _messages.Enqueue(message);
+                if (_waitingReceivers.TryDequeue(out var receiver))
+                {
+                    receiver.SetResult(message);
+                }
+                else
+                {
+                    _messages.Enqueue(message);
+                }
             }
         }
         public async Task<object> ReceiveAsync()

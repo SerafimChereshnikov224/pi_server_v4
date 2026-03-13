@@ -59,7 +59,7 @@ namespace PiServer.version_2.runtime
                 if (p is OutputProcess op && IsLambdaExpression(op.Message))
                 {
                     var evaluatedMessage = TryEvaluateLambda(op.Message, env);
-                    return new OutputProcess(op.Channel, evaluatedMessage, op.Continuation);
+                    return new OutputProcess(op.Channel, evaluatedMessage, op.Continuation, op.IsBroadcast);
                 }
                 return p;
             }).ToList();
@@ -115,7 +115,7 @@ namespace PiServer.version_2.runtime
         private Process SimulateOutputWithLambda(OutputProcess op, PiEnvironment env)
         {
             var evaluatedMessage = TryEvaluateLambda(op.Message, env);
-            return new OutputProcess(op.Channel, evaluatedMessage, op.Continuation);
+            return new OutputProcess(op.Channel, evaluatedMessage, op.Continuation, op.IsBroadcast);
         }
 
         private Process Substitute(Process process, string variable, string value)
@@ -125,8 +125,9 @@ namespace PiServer.version_2.runtime
             if (process is OutputProcess op)
                 return new OutputProcess(
                     op.Channel == variable ? value : op.Channel,
-                    op.Message?.ToString() == variable ? value : op.Message,
-                    Substitute(op.Continuation, variable, value));
+                        op.Message?.ToString() == variable ? value : op.Message,
+                            Substitute(op.Continuation, variable, value),
+                                op.IsBroadcast);
 
             if (process is InputProcess ip)
                 return new InputProcess(

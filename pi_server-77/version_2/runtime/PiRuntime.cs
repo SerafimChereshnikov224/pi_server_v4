@@ -1,15 +1,15 @@
-﻿using PiServer.version_2.interpreter.core;
+﻿using PiServer.Services;
+using PiServer.version_2.interpreter.core;
+using PiServer.version_2.interpreter.core.parser;
 using PiServer.version_2.interpreter.core.syntax;
 using System.Text.Json.Serialization;
-using PiServer.Services;
-using PiServer.version_2.interpreter.core.parser;
 
 namespace PiServer.version_2.runtime
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using System.Text.RegularExpressions;
+    using System.Threading.Tasks;
 
     public class PiRuntime
     {
@@ -124,7 +124,6 @@ namespace PiServer.version_2.runtime
             var inputs = processes.OfType<InputProcess>().ToList();
             var lets = processes.OfType<LetProcess>().ToList();
 
-            // Let processes
             foreach (var let in lets)
             {
                 await let.ExecuteAsync(_env);
@@ -137,24 +136,51 @@ namespace PiServer.version_2.runtime
 
             foreach (var output in outputs)
             {
-                var matchingInput = inputs.FirstOrDefault(input =>
-                    input.Channel == output.Channel && !matchedInputs.Contains(input));
-
-                if (matchingInput != null)
+                if (output.IsBroadcast)
                 {
-                    string message = EvaluateMessageToString(output.Message);
-                    message = SubstituteVariablesInLambda(message, _env);
-                    await _env.SendAsync(output.Channel, message);
+                    var matchingInputs = inputs
+                        .Where(input => input.Channel == output.Channel && !matchedInputs.Contains(input))
+                        .ToList();
 
-                    _env.SetVariable(matchingInput.Variable, message);
+                    if (matchingInputs.Any())
+                    {
+                        string message = EvaluateMessageToString(output.Message);
+                        message = SubstituteVariablesInLambda(message, _env);
+                        await _env.SendAsync(output.Channel, message, true); // broadcast
 
-                    continuations.Add(output.Continuation);
-                    continuations.Add(matchingInput.Continuation);
+                        foreach (var input in matchingInputs)
+                        {
+                            _env.SetVariable(input.Variable, message);
+                            continuations.Add(input.Continuation);
+                            matchedInputs.Add(input);
+                            communications.Add($"Broadcast '{message}' to {input.Channel}?({input.Variable})");
+                        }
 
-                    communications.Add($"Sent '{message}' via {output.Channel}");
+                        continuations.Add(output.Continuation);
+                        matchedOutputs.Add(output);
+                    }
+                }
+                else // unicast
+                {
+                    var matchingInput = inputs.FirstOrDefault(input =>
+                        input.Channel == output.Channel && !matchedInputs.Contains(input));
 
-                    matchedOutputs.Add(output);
-                    matchedInputs.Add(matchingInput);
+                    if (matchingInput != null)
+                    {
+                        string message = EvaluateMessageToString(output.Message);
+                        message = SubstituteVariablesInLambda(message, _env);
+                        await _env.SendAsync(output.Channel, message, false);
+
+                        _env.SetVariable(matchingInput.Variable, message);
+
+                        continuations.Add(output.Continuation);
+                        continuations.Add(matchingInput.Continuation);
+
+                        communications.Add($"Sent '{message}' via {output.Channel}");
+
+                        matchedOutputs.Add(output);
+                        matchedInputs.Add(matchingInput);
+                    }
                 }
             }
 

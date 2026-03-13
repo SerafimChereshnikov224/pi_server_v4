@@ -44,6 +44,12 @@ public class Lexer
             return new Token(TokenType.Def, position: startPos);
         }
 
+        if (current == '!' && Peek() == '!')
+        {
+            _position += 2;
+            return new Token(TokenType.OutputBroadcastOp, position: startPos);
+        }
+
         switch (current)
         {
             case '0': _position++; return new Token(TokenType.NullProcess, position: startPos);

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PiServer.Services;
+using PiServer.version_2.interpreter.core.syntax;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using PiServer.Services;
-using PiServer.version_2.interpreter.core.syntax;
 
 namespace PiServer.version_2.interpreter.core.parser
 {
@@ -148,28 +148,29 @@ private ArithmeticExpression ParseFactor()
             Eat(TokenType.Identifier);
 
             if (_currentToken.Type == TokenType.OutputOp)
-                return ParseOutput(channel);
+                return ParseOutput(channel, isBroadcast: false);
+            if (_currentToken.Type == TokenType.OutputBroadcastOp)
+                return ParseOutput(channel, isBroadcast: true);
             if (_currentToken.Type == TokenType.InputOp)
                 return ParseInput(channel);
 
             return new NullProcess();
         }
 
-private Process ParseOutput(string channel)
-{
-    Eat(TokenType.OutputOp);
-    Eat(TokenType.OpenBracket);
+        private Process ParseOutput(string channel, bool isBroadcast)
+        {
+            Eat(isBroadcast ? TokenType.OutputBroadcastOp : TokenType.OutputOp);
+            Eat(TokenType.OpenBracket);
 
-    // Собираем всё содержимое между [ и ]
-    string message = ReadMessageContent();
+            string message = ReadMessageContent();
 
-    Eat(TokenType.CloseBracket);
-    Eat(TokenType.Dot);
+            Eat(TokenType.CloseBracket);
+            Eat(TokenType.Dot);
 
-    return new OutputProcess(channel, message, ParseSingleProcess());
-}
+            return new OutputProcess(channel, message, ParseSingleProcess(), isBroadcast);
+        }
 
-private string ReadMessageContent()
+        private string ReadMessageContent()
 {
     // Если сразу закрывающая скобка — пустое сообщение
     if (_currentToken.Type == TokenType.CloseBracket)

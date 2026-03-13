@@ -67,28 +67,28 @@ namespace PiServer.version_2.interpreter.core.syntax
         public string Channel { get; }
         public object Message { get; }      // теперь object — может быть string, ArithmeticExpression, LambdaTerm и т.д.
         public Process Continuation { get; }
+        public bool IsBroadcast { get; }
 
-        public OutputProcess(string channel, object message, Process continuation)
+        public OutputProcess(string channel, object message, Process continuation, bool isBroadcast = false)
         {
             Channel = channel;
             Message = message;
             Continuation = continuation;
+            IsBroadcast = isBroadcast;
         }
 
         public override async Task ExecuteAsync(PiEnvironment env)
         {
-            // Получаем строковое представление сообщения с учётом типов
             string outputValue = ResolveMessageObject(Message, env);
-
-            // Отправляем (PiEnvironment.SendAsync принимает object message в твоем текущем коде)
-            await env.SendAsync(Channel, outputValue);
-
-            // Продолжаем выполнение
-            if (Continuation != null)
-                await Continuation.ExecuteAsync(env);
+            await env.SendAsync(Channel, outputValue, IsBroadcast);
+            if (Continuation != null) await Continuation.ExecuteAsync(env);
         }
 
-        public override string ToString() => $"{Channel}![{Message}].{Continuation}";
+        public override string ToString()
+        {
+            string op = IsBroadcast ? "!!" : "!";
+            return $"{Channel}{op}[{Message}].{Continuation}";
+        }
 
         // --- вспомогательное: приведение message -> строка, с безопасной обработкой арифметики и лямбда-выражений
         private string ResolveMessageObject(object? msgObj, PiEnvironment env)

@@ -62,11 +62,11 @@ public Channel GetChannel(string name)
 
 
 
-        public async Task SendAsync(string channelName, object message)
+        public async Task SendAsync(string channelName, object message, bool broadcast = false)
         {
             var channel = GetChannel(channelName);
-            await channel.SendAsync(message);
-            Console.WriteLine($"[PiEnv] Sent '{message}' via '{channelName}'");
+            await channel.SendAsync(message, broadcast);
+            Console.WriteLine($"[PiEnv] Sent '{message}' via '{channelName}' (broadcast={broadcast})");
         }
 
         public async Task<object> ReceiveAsync(string channelName)
