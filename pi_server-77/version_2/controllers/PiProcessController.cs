@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PiServer.Services;
 using PiServer.version_2.interpreter.core.parser;
 using PiServer.version_2.interpreter.core.syntax;
 using PiServer.version_2.models;
 using PiServer.version_2.runtime;
+using System;
 using System.Collections.Concurrent;
-using PiServer.Services;
+using PiServer.version_2.analyzer;
 
 namespace PiServer.version_2.controllers
 {
@@ -229,6 +231,23 @@ namespace PiServer.version_2.controllers
                 Hint = session.GetCurrentHint(),
                 ExpectedNextStep = session.GetCurrentExpectedStep()
             });
+        }
+
+        // --- [ 11. Анализ введенного выражения ] ---
+        [HttpPost("analyze")]
+        public IActionResult AnalyzeProcess([FromBody] ProcessRequest request)
+        {
+            try
+            {
+                var parser = new PiParser(request.ProcessDefinition);
+                var process = parser.Parse();
+                var analysis = PiAnalyzer.Analyze(process);
+                return Ok(analysis);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
         }
 
         // --- [ Helper: ожидание первого шага в обучении ] ---
