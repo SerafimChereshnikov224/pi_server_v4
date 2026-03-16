@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 namespace PiServer.version_2.runtime
 {
     using System.Collections.Generic;
+    using Process = PiServer.version_2.interpreter.core.syntax.Process;
     using System.Linq;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -85,6 +86,17 @@ namespace PiServer.version_2.runtime
             }
             result.ActiveRestrictions = _env.ActiveRestrictions.ToList();
 
+            // Проверка на deadlock (только если процесс ещё не завершён)
+            if (!result.IsCompleted)
+            {
+                result.IsDeadlocked = IsDeadlocked();
+                if (result.IsDeadlocked)
+                {
+                    var deadInputs = CollectInputs(_currentProcess);
+                    result.DeadlockedInputs = deadInputs.Select(ip => ip.ToString()).ToList();
+                }
+            }
+
             return result;
         }
 
@@ -114,6 +126,134 @@ namespace PiServer.version_2.runtime
             return process;
         }
 
+        public List<InputProcess> CollectInputs(Process process)
+        {
+            var result = new List<InputProcess>();
+            CollectInputsInternal(process, result);
+            return result;
+        }
+
+        public List<OutputProcess> CollectOutputs(Process process)
+        {
+            var result = new List<OutputProcess>();
+            CollectOutputsInternal(process, result);
+            return result;
+        }
+
+        private void CollectInputsInternal(Process process, List<InputProcess> result)
+        {
+            switch (process)
+            {
+                case InputProcess ip:
+                    result.Add(ip);
+                    break;
+                case OutputProcess op:
+                    CollectInputsInternal(op.Continuation, result);
+                    break;
+                case ParallelProcess pp:
+                    foreach (var p in pp.Processes)
+                        CollectInputsInternal(p, result);
+                    break;
+                case IfElseProcess ifp:
+                    CollectInputsInternal(ifp.ThenBranch, result);
+                    CollectInputsInternal(ifp.ElseBranch, result);
+                    break;
+                case LetProcess lp:
+                    CollectInputsInternal(lp.Continuation, result);
+                    break;
+                // RestrictionProcess игнорируем по просьбе, но если встретится, обойдём тело
+                case RestrictionProcess rp:
+                    CollectInputsInternal(rp.Body, result);
+                    break;
+                    // NullProcess и прочее игнорируем
+            }
+        }
+
+        private void CollectOutputsInternal(Process process, List<OutputProcess> result)
+        {
+            switch (process)
+            {
+                case OutputProcess op:
+                    result.Add(op);
+                    break;
+                case InputProcess ip:
+                    CollectOutputsInternal(ip.Continuation, result);
+                    break;
+                case ParallelProcess pp:
+                    foreach (var p in pp.Processes)
+                        CollectOutputsInternal(p, result);
+                    break;
+                case IfElseProcess ifp:
+                    CollectOutputsInternal(ifp.ThenBranch, result);
+                    CollectOutputsInternal(ifp.ElseBranch, result);
+                    break;
+                case LetProcess lp:
+                    CollectOutputsInternal(lp.Continuation, result);
+                    break;
+                case RestrictionProcess rp:
+                    CollectOutputsInternal(rp.Body, result);
+                    break;
+            }
+        }
+
+        private Process Substitute(Process process, string variable, string value)
+        {
+            if (process is NullProcess) return process;
+            if (process is OutputProcess op)
+                return new OutputProcess(
+                    op.Channel == variable ? value : op.Channel,
+                    op.Message?.ToString() == variable ? value : op.Message,
+                    Substitute(op.Continuation, variable, value),
+                    op.IsBroadcast);
+            if (process is InputProcess ip)
+                return new InputProcess(
+                    ip.Channel == variable ? value : ip.Channel,
+                    ip.Variable,
+                    Substitute(ip.Continuation, variable, value));
+            if (process is LetProcess lp)
+                return new LetProcess(
+                    lp.ResultVar,
+                    lp.Lambda,
+                    lp.ArgumentVar == variable ? value : lp.ArgumentVar,
+                    Substitute(lp.Continuation, variable, value));
+            if (process is ParallelProcess pp)
+            {
+                var substituted = pp.Processes.Select(p => Substitute(p, variable, value)).ToList();
+                return new ParallelProcess(substituted);
+            }
+            if (process is RestrictionProcess rp)
+                return new RestrictionProcess(rp.Name, Substitute(rp.Body, variable, value));
+            if (process is IfElseProcess ifp)
+                return new IfElseProcess(
+                    ifp.Condition,
+                    Substitute(ifp.ThenBranch, variable, value),
+                    Substitute(ifp.ElseBranch, variable, value));
+            return process;
+        }
+
+        public bool IsDeadlocked()
+        {
+            // Если процесс завершён, deadlock быть не может
+            if (IsCompleted) return false;
+
+            var inputs = CollectInputs(_currentProcess);
+            if (inputs.Count == 0) return false; // нет входов -> всегда есть возможность выполнить выходы
+
+            var outputs = CollectOutputs(_currentProcess);
+            if (outputs.Count > 0) return false; // есть выходы -> они могут выполниться
+
+            // Проверяем, есть ли сообщения в каналах для ожидающих входов
+            foreach (var input in inputs)
+            {
+                var channel = _env.GetChannel(input.Channel);
+                if (channel.HasMessages())
+                    return false; // хотя бы один вход может получить сообщение
+            }
+
+            // Все входы ждут, каналы пусты
+            return true;
+        }
+
         private async Task<(Process NewProcess, List<string> Communications)> ExecuteParallelCommunications(ParallelProcess pp)
         {
             var continuations = new List<Process>();
@@ -124,6 +264,7 @@ namespace PiServer.version_2.runtime
             var inputs = processes.OfType<InputProcess>().ToList();
             var lets = processes.OfType<LetProcess>().ToList();
 
+            // 1. Все let-выражения
             foreach (var let in lets)
             {
                 await let.ExecuteAsync(_env);
@@ -131,9 +272,10 @@ namespace PiServer.version_2.runtime
                 communications.Add($"Computed {let.ResultVar} = {let.Lambda}");
             }
 
-            var matchedOutputs = new List<OutputProcess>();
-            var matchedInputs = new List<InputProcess>();
+            var matchedOutputs = new HashSet<OutputProcess>();
+            var matchedInputs = new HashSet<InputProcess>();
 
+            // 2. Все возможные коммуникации (пары выход-вход)
             foreach (var output in outputs)
             {
                 if (output.IsBroadcast)
@@ -146,12 +288,11 @@ namespace PiServer.version_2.runtime
                     {
                         string message = EvaluateMessageToString(output.Message);
                         message = SubstituteVariablesInLambda(message, _env);
-                        await _env.SendAsync(output.Channel, message, true); // broadcast
 
                         foreach (var input in matchingInputs)
                         {
-                            _env.SetVariable(input.Variable, message);
-                            continuations.Add(input.Continuation);
+                            var substitutedContinuation = Substitute(input.Continuation, input.Variable, message);
+                            continuations.Add(substitutedContinuation);
                             matchedInputs.Add(input);
                             communications.Add($"Broadcast '{message}' to {input.Channel}?({input.Variable})");
                         }
@@ -169,13 +310,10 @@ namespace PiServer.version_2.runtime
                     {
                         string message = EvaluateMessageToString(output.Message);
                         message = SubstituteVariablesInLambda(message, _env);
-                        await _env.SendAsync(output.Channel, message, false);
 
-                        _env.SetVariable(matchingInput.Variable, message);
-
+                        var substitutedContinuation = Substitute(matchingInput.Continuation, matchingInput.Variable, message);
                         continuations.Add(output.Continuation);
-                        continuations.Add(matchingInput.Continuation);
-
+                        continuations.Add(substitutedContinuation);
                         communications.Add($"Sent '{message}' via {output.Channel}");
 
                         matchedOutputs.Add(output);
@@ -184,7 +322,52 @@ namespace PiServer.version_2.runtime
                 }
             }
 
-            continuations.AddRange(outputs.Except(matchedOutputs));
+            // 3. Если были коммуникации, одиночные выходы не выполняем, оставляем на следующий шаг
+            if (matchedOutputs.Any() || matchedInputs.Any())
+            {
+                // Добавляем неиспользованные выходы и входы обратно
+                continuations.AddRange(outputs.Except(matchedOutputs));
+                continuations.AddRange(inputs.Except(matchedInputs));
+            }
+            else
+            {
+                // 3a. Если коммуникаций не было, выполняем все одиночные выходы
+                foreach (var output in outputs.Except(matchedOutputs))
+                {
+                    await output.ExecuteAsync(_env);
+                    continuations.Add(output.Continuation);
+                    communications.Add($"Executed output on {output.Channel} (no partner)");
+                    matchedOutputs.Add(output);
+                }
+
+                // 3b. Все входы с сообщениями
+                foreach (var input in inputs.Except(matchedInputs))
+                {
+                    var channel = _env.GetChannel(input.Channel);
+                    if (channel.HasMessages())
+                    {
+                        await input.ExecuteAsync(_env);
+                        continuations.Add(input.Continuation);
+                        communications.Add($"Executed input on {input.Channel} (message available)");
+                        matchedInputs.Add(input);
+                    }
+                }
+            }
+
+            // 4. Все входы, у которых есть сообщения в каналах (и которые не были сопоставлены)
+            foreach (var input in inputs.Except(matchedInputs))
+            {
+                var channel = _env.GetChannel(input.Channel);
+                if (channel.HasMessages())
+                {
+                    await input.ExecuteAsync(_env);
+                    continuations.Add(input.Continuation);
+                    communications.Add($"Executed input on {input.Channel} (message available)");
+                    matchedInputs.Add(input);
+                }
+            }
+
+            // 5. Добавляем оставшиеся (входы без сообщений и другие процессы)
             continuations.AddRange(inputs.Except(matchedInputs));
             continuations.AddRange(processes.Except(outputs).Except(inputs).Except(lets));
 
@@ -289,5 +472,7 @@ namespace PiServer.version_2.runtime
         public Dictionary<string, string> Variables { get; set; } = new();
         public Dictionary<string, List<string>> ChannelStates { get; set; } = new();
         public List<string> ActiveRestrictions { get; set; } = new();
+        public bool IsDeadlocked { get; set; }
+        public List<string> DeadlockedInputs { get; set; } = new();
     }
 }

@@ -49,6 +49,11 @@ namespace PiServer.version_2.runtime
             return await tcs.Task;
         }
 
+        public bool HasMessages()
+        {
+            return _messages.Count > 0;
+        }
+
         public IEnumerable<object> GetMessages()
         {
             return _messages.ToArray();

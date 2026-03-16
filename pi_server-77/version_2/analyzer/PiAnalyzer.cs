@@ -1,6 +1,8 @@
 ﻿using PiServer.version_2.interpreter.core.syntax;
-using System.Collections.Generic;
 using PiServer.version_2.models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using PiServer.version_2.runtime;
 
 namespace PiServer.version_2.analyzer
 {
@@ -90,6 +92,54 @@ namespace PiServer.version_2.analyzer
                 default:
                     break;
             }
+        }
+
+        public static async Task<SimulationResult> SimulateAsync(Process process, int maxSteps = 1000)
+        {
+            var runtime = new PiRuntime(process);
+            var result = new SimulationResult();
+
+            for (int step = 0; step < maxSteps; step++)
+            {
+                if (runtime.IsCompleted)
+                {
+                    result.IsDeadlocked = false;
+                    result.StepsExecuted = step;
+                    result.FinalState = runtime.CurrentProcess.ToString();
+                    return result;
+                }
+
+                if (runtime.IsDeadlocked())
+                {
+                    result.IsDeadlocked = true;
+                    result.StepsExecuted = step;
+                    result.FinalState = runtime.CurrentProcess.ToString();
+
+                    var inputs = runtime.CollectInputs(runtime.CurrentProcess);
+                    var outputs = runtime.CollectOutputs(runtime.CurrentProcess);
+                    var allBlocked = new List<string>();
+                    allBlocked.AddRange(inputs.Select(ip => ip.ToString()));
+                    allBlocked.AddRange(outputs.Select(op => op.ToString()));
+                    result.DeadlockedProcesses = allBlocked;
+                    return result;
+                }
+
+                await runtime.ExecuteStepAsync();
+            }
+
+            // Лимит шагов достигнут
+            result.IsDeadlocked = runtime.IsDeadlocked();
+            result.StepsExecuted = maxSteps;
+            result.FinalState = runtime.CurrentProcess.ToString();
+            if (result.IsDeadlocked)
+            {
+                var inputs = runtime.CollectInputs(runtime.CurrentProcess);
+                var outputs = runtime.CollectOutputs(runtime.CurrentProcess);
+                result.DeadlockedProcesses = inputs.Select(ip => ip.ToString())
+                    .Concat(outputs.Select(op => op.ToString()))
+                    .ToList();
+            }
+            return result;
         }
     }
 }
