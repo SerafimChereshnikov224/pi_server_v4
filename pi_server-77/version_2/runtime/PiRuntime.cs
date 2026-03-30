@@ -200,11 +200,18 @@ namespace PiServer.version_2.runtime
         {
             if (process is NullProcess) return process;
             if (process is OutputProcess op)
+            {
+                string newMessage = op.Message?.ToString();
+                if (newMessage != null && newMessage.Contains(variable))
+                {
+                    newMessage = ReplaceInString(newMessage, variable, value);
+                }
                 return new OutputProcess(
                     op.Channel == variable ? value : op.Channel,
-                    op.Message?.ToString() == variable ? value : op.Message,
+                    newMessage,
                     Substitute(op.Continuation, variable, value),
                     op.IsBroadcast);
+            }
             if (process is InputProcess ip)
                 return new InputProcess(
                     ip.Channel == variable ? value : ip.Channel,
@@ -221,14 +228,36 @@ namespace PiServer.version_2.runtime
                 var substituted = pp.Processes.Select(p => Substitute(p, variable, value)).ToList();
                 return new ParallelProcess(substituted);
             }
+            if (process is IfElseProcess ifp)
+            {
+                // Подставляем переменную в условие (левая и правая части)
+                var newCondition = new Condition(
+                    SubstituteArithmetic(ifp.Condition.Left, variable, value),
+                    ifp.Condition.Operator,
+                    SubstituteArithmetic(ifp.Condition.Right, variable, value)
+                );
+                // Подставляем переменную в обе ветки (рекурсивно)
+                var newThen = Substitute(ifp.ThenBranch, variable, value);
+                var newElse = Substitute(ifp.ElseBranch, variable, value);
+                // Возвращаем новый IfElseProcess (не вычисляем условие, оставляем на следующий шаг)
+                return new IfElseProcess(newCondition, newThen, newElse);
+            }
             if (process is RestrictionProcess rp)
                 return new RestrictionProcess(rp.Name, Substitute(rp.Body, variable, value));
-            if (process is IfElseProcess ifp)
-                return new IfElseProcess(
-                    ifp.Condition,
-                    Substitute(ifp.ThenBranch, variable, value),
-                    Substitute(ifp.ElseBranch, variable, value));
             return process;
+        }
+
+        private ArithmeticExpression SubstituteArithmetic(ArithmeticExpression expr, string variable, string value)
+        {
+            if (expr is VariableExpr varExpr && varExpr.Name == variable)
+                return new NumberExpr(int.Parse(value));
+            if (expr is BinaryExpr binExpr)
+                return new BinaryExpr(
+                    binExpr.Op,
+                    SubstituteArithmetic(binExpr.Left, variable, value),
+                    SubstituteArithmetic(binExpr.Right, variable, value)
+                );
+            return expr;
         }
 
         public bool IsDeadlocked()
@@ -264,7 +293,7 @@ namespace PiServer.version_2.runtime
             var inputs = processes.OfType<InputProcess>().ToList();
             var lets = processes.OfType<LetProcess>().ToList();
 
-            // 1. Все let-выражения
+            // Let-выражения
             foreach (var let in lets)
             {
                 await let.ExecuteAsync(_env);
@@ -272,10 +301,10 @@ namespace PiServer.version_2.runtime
                 communications.Add($"Computed {let.ResultVar} = {let.Lambda}");
             }
 
-            var matchedOutputs = new HashSet<OutputProcess>();
-            var matchedInputs = new HashSet<InputProcess>();
+            var matchedOutputs = new List<OutputProcess>();
+            var matchedInputs = new List<InputProcess>();
 
-            // 2. Все возможные коммуникации (пары выход-вход)
+            // Обработка пар (коммуникаций)
             foreach (var output in outputs)
             {
                 if (output.IsBroadcast)
@@ -322,17 +351,10 @@ namespace PiServer.version_2.runtime
                 }
             }
 
-            // 3. Если были коммуникации, одиночные выходы не выполняем, оставляем на следующий шаг
-            if (matchedOutputs.Any() || matchedInputs.Any())
+            // Если коммуникаций не было, выполняем одиночные выходы и входы с сообщениями
+            if (!matchedOutputs.Any() && !matchedInputs.Any())
             {
-                // Добавляем неиспользованные выходы и входы обратно
-                continuations.AddRange(outputs.Except(matchedOutputs));
-                continuations.AddRange(inputs.Except(matchedInputs));
-            }
-            else
-            {
-                // 3a. Если коммуникаций не было, выполняем все одиночные выходы
-                foreach (var output in outputs.Except(matchedOutputs))
+                foreach (var output in outputs)
                 {
                     await output.ExecuteAsync(_env);
                     continuations.Add(output.Continuation);
@@ -340,8 +362,7 @@ namespace PiServer.version_2.runtime
                     matchedOutputs.Add(output);
                 }
 
-                // 3b. Все входы с сообщениями
-                foreach (var input in inputs.Except(matchedInputs))
+                foreach (var input in inputs)
                 {
                     var channel = _env.GetChannel(input.Channel);
                     if (channel.HasMessages())
@@ -354,20 +375,8 @@ namespace PiServer.version_2.runtime
                 }
             }
 
-            // 4. Все входы, у которых есть сообщения в каналах (и которые не были сопоставлены)
-            foreach (var input in inputs.Except(matchedInputs))
-            {
-                var channel = _env.GetChannel(input.Channel);
-                if (channel.HasMessages())
-                {
-                    await input.ExecuteAsync(_env);
-                    continuations.Add(input.Continuation);
-                    communications.Add($"Executed input on {input.Channel} (message available)");
-                    matchedInputs.Add(input);
-                }
-            }
-
-            // 5. Добавляем оставшиеся (входы без сообщений и другие процессы)
+            // Добавляем неиспользованные процессы
+            continuations.AddRange(outputs.Except(matchedOutputs));
             continuations.AddRange(inputs.Except(matchedInputs));
             continuations.AddRange(processes.Except(outputs).Except(inputs).Except(lets));
 
@@ -378,6 +387,10 @@ namespace PiServer.version_2.runtime
 
             return (new ParallelProcess(continuations), communications);
         }
+
+
+
+
 
         private bool IsLambdaExpression(string expression)
         {
@@ -458,6 +471,11 @@ namespace PiServer.version_2.runtime
             }
 
             return expr;
+        }
+
+        private string ReplaceInString(string expr, string variable, string value)
+        {
+            return Regex.Replace(expr, $@"\b{Regex.Escape(variable)}\b", value);
         }
 
 

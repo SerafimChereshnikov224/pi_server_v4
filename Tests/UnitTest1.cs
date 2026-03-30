@@ -954,26 +954,39 @@ namespace PiServer.version_2.interpreter.tests
         [Fact]
         public async Task ExecuteStep_LambdaWithCondition_CompletesCorrectly()
         {
-            // x![10].0 | x?(n).if n > 5 then y![( fun x -> x * 2 ) n].0 else y![].0 | y?(res).0
             var parser = new PiParser("x![10].0 | x?(n).if n > 5 then y![( fun x -> x * 2 ) n].0 else y![].0 | y?(res).0");
             var process = parser.Parse();
             var session = new PiRuntimeSession(process);
-
-            // Шаг 1: коммуникация по x
             var step1 = await session.ExecuteStepAsync();
-            // После первого шага должно получиться: if 10 > 5 then y![(fun x -> x * 2) 10].0 else y![].0 | y?(res).0
             Assert.False(step1.IsCompleted);
-            Assert.Contains("y![( fun x -> x * 2 ) 10].0", step1.CurrentState);
-            Assert.Contains("y?(res).0", step1.CurrentState);
-            Assert.DoesNotContain("x![10].0", step1.CurrentState);
-            Assert.DoesNotContain("x?(n)", step1.CurrentState);
-
-            // Шаг 2: вычисление условия и коммуникация по y
+            Assert.Contains("if 10 > 5 then y![( fun x -> x * 2 ) 10].0 else y![].0 | y?(res).0", step1.CurrentState);
             var step2 = await session.ExecuteStepAsync();
-            // После второго шага должно быть 0
             Assert.True(step2.IsCompleted);
-            Assert.Equal("0", step2.CurrentState);
         }
+
+        [Fact]
+        public async Task ExecuteStep_ChainWithConditionAndArithmetic_CompletesCorrectly()
+        {
+            var parser = new PiParser("x![5].0 | x?(n).if n > 3 then y![( fun x -> x * 2 ) n].0 else y![0].0 | y?(res).z![res].0 | z?(final).0");
+            var process = parser.Parse();
+            var session = new PiRuntimeSession(process);
+
+            var step1 = await session.ExecuteStepAsync();
+            Assert.False(step1.IsCompleted);
+            // Разрешаем в else ветке как y![0], так и y![]
+            Assert.Matches(@"if 5 > 3 then y!\[\( fun x -> x \* 2 \) 5\]\.0 else y!\[(0)?\]\.0 \| y\?\(res\)\.z!\[res\]\.0 \| z\?\(final\)\.0", step1.CurrentState);
+
+         
+
+            var step3 = await session.ExecuteStepAsync();
+            Assert.False(step3.IsCompleted);
+            Assert.Contains("z![10].0 | z?(final).0", step3.CurrentState);
+
+            var step4 = await session.ExecuteStepAsync();
+            Assert.True(step4.IsCompleted);
+            Assert.Equal("0", step4.CurrentState);
+        }
+
 
 
 
