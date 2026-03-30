@@ -951,6 +951,30 @@ namespace PiServer.version_2.interpreter.tests
             }
         }
 
+        [Fact]
+        public async Task ExecuteStep_LambdaWithCondition_CompletesCorrectly()
+        {
+            // x![10].0 | x?(n).if n > 5 then y![( fun x -> x * 2 ) n].0 else y![].0 | y?(res).0
+            var parser = new PiParser("x![10].0 | x?(n).if n > 5 then y![( fun x -> x * 2 ) n].0 else y![].0 | y?(res).0");
+            var process = parser.Parse();
+            var session = new PiRuntimeSession(process);
+
+            // Шаг 1: коммуникация по x
+            var step1 = await session.ExecuteStepAsync();
+            // После первого шага должно получиться: if 10 > 5 then y![(fun x -> x * 2) 10].0 else y![].0 | y?(res).0
+            Assert.False(step1.IsCompleted);
+            Assert.Contains("y![( fun x -> x * 2 ) 10].0", step1.CurrentState);
+            Assert.Contains("y?(res).0", step1.CurrentState);
+            Assert.DoesNotContain("x![10].0", step1.CurrentState);
+            Assert.DoesNotContain("x?(n)", step1.CurrentState);
+
+            // Шаг 2: вычисление условия и коммуникация по y
+            var step2 = await session.ExecuteStepAsync();
+            // После второго шага должно быть 0
+            Assert.True(step2.IsCompleted);
+            Assert.Equal("0", step2.CurrentState);
+        }
+
 
 
 
