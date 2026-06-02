@@ -45,7 +45,13 @@ namespace PiServer.version_2.runtime
             if (IsCompleted) throw new InvalidOperationException("Process completed");
 
             // Обработка разных типов процессов
-            if (CurrentProcess is OutputProcess op)
+            if (CurrentProcess is AgentProcess ap)
+            {
+                _currentProcess = ap.InnerProcess;
+
+                result.LastAction = $"Entered agent '{ap.AgentName}'";
+            }
+            else if (CurrentProcess is OutputProcess op)
             {
                 string msgStr = EvaluateMessageToString(op.Message);
                 await op.ExecuteAsync(_env);
@@ -104,6 +110,14 @@ namespace PiServer.version_2.runtime
 
         private Process UnwrapIfs(Process process)
         {
+            if (process is AgentProcess ap)
+            {
+                return new AgentProcess(
+                    ap.AgentName,
+                    UnwrapIfs(ap.InnerProcess)
+                );
+            }
+
             if (process is IfElseProcess ifp)
             {
                 try
@@ -288,7 +302,10 @@ namespace PiServer.version_2.runtime
             var continuations = new List<Process>();
             var communications = new List<string>();
 
-            var processes = pp.Processes.Select(UnwrapIfs).ToList();
+            var processes = pp.Processes
+                .Select(UnwrapIfs)
+                .Select(p => p is AgentProcess ap ? ap.InnerProcess : p)
+                .ToList();            
             var outputs = processes.OfType<OutputProcess>().ToList();
             var inputs = processes.OfType<InputProcess>().ToList();
             var lets = processes.OfType<LetProcess>().ToList();

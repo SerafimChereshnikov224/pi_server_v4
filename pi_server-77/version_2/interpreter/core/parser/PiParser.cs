@@ -3,6 +3,7 @@ using PiServer.version_2.interpreter.core.syntax;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using PiServer.version_2.runtime;
 
 namespace PiServer.version_2.interpreter.core.parser
 {
@@ -142,17 +143,30 @@ private ArithmeticExpression ParseFactor()
             };
         }
 
+
+
+
         private Process ParseAction()
         {
-            var channel = _currentToken.Value;
+            var name = _currentToken.Value;
             Eat(TokenType.Identifier);
 
+            // Agent: Alice:{...}
+            if (_currentToken.Type == TokenType.Colon)
+            {
+                Eat(TokenType.Colon);
+                Eat(TokenType.OpenBrace);
+                var inner = ParseExpression();
+                Eat(TokenType.CloseBrace);
+                return new AgentProcess(name, inner);
+            }
+
             if (_currentToken.Type == TokenType.OutputOp)
-                return ParseOutput(channel, isBroadcast: false);
+                return ParseOutput(name, isBroadcast: false);
             if (_currentToken.Type == TokenType.OutputBroadcastOp)
-                return ParseOutput(channel, isBroadcast: true);
+                return ParseOutput(name, isBroadcast: true);
             if (_currentToken.Type == TokenType.InputOp)
-                return ParseInput(channel);
+                return ParseInput(name);
 
             return new NullProcess();
         }

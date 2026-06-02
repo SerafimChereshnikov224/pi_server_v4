@@ -80,7 +80,8 @@ public class Lexer
                     _position += 2;
                     return new Token(TokenType.Def, position: startPos);
                 }
-                break;
+                _position++;
+                return new Token(TokenType.Colon, position: startPos);
             case '-': 
                 if (Peek() == '>') // стрелка ->
                 {

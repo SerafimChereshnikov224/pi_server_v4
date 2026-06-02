@@ -42,7 +42,8 @@
         GreaterThan,
         LessThan,
         Equals,
-        NotEquals
+        NotEquals,
+        Colon,
     }
 
     public class Token
